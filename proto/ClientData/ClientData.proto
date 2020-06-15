@@ -18,17 +18,35 @@ package ClientData;
 // The greeting service definition.
 service ClientData {
   // Sends a greeting
-  rpc ClientDataPut (HelloRequest) returns (HelloReply) {}
-  rpc ClientDataDelete (HelloRequest) returns (HelloReply) {}
-  rpc ClientDataRead (HelloRequest) returns (HelloReply) {}
+  rpc ClientDataPut (ClientDataPutReq) returns (ClientDataPutResp) {}
+  rpc ClientDataDelete (ClientDataDeleteReq) returns (ClientDataDeleteResp) {}
+  rpc ClientDataRead (ClientDataReadReq) returns (ClientDataReadResp) {}
 }
 
 // The request message containing the user's name.
-message HelloRequest {
-  string name = 1;
+message ClientDataPutReq {
+  string key = 1;
+  string value = 2;
+}
+
+message ClientDataPutResp{
+  string message = 1;
 }
 
 // The response message containing the greetings
-message HelloReply {
+message ClientDataReadReq {
+  string key = 1;
+}
+
+message ClientDataReadResp{
+  string value = 1;
+  string message = 2;
+}
+
+message ClientDataDeleteReq {
+  string key = 1;
+}
+
+message ClientDataDeleteResp{
   string message = 1;
 }

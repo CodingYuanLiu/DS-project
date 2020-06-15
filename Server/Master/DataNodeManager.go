@@ -44,7 +44,7 @@ func NewDataNode(port string) *DataNode{
 */
 
 func (dataNodeManager DataNodeManager)RegisterDataNode(port string) error{
-	//TODO: lock the master node and corresponding data node when register is undone
+	//TODO: lock the master.exe node and corresponding data node when register is undone
 
 	/*
 	//Register the Node at NodeMeta

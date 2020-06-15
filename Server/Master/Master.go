@@ -34,7 +34,7 @@ func (master *Master) ClientMasterPut(ctx context.Context, req *clientMasterPb.C
 }
 
 func main(){
-	fmt.Println("Start to run master node...")
+	fmt.Println("Start to run master.exe node...")
 	lis,err := net.Listen("tcp", masterPort)
 	if err != nil{
 		log.Fatalf("failed to listen %v\n", err)

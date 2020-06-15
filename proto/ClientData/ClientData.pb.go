@@ -44,16 +44,17 @@ const (
 const _ = proto.ProtoPackageIsVersion4
 
 // The request message containing the user's name.
-type HelloRequest struct {
+type ClientDataPutReq struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	Key   string `protobuf:"bytes,1,opt,name=key,proto3" json:"key,omitempty"`
+	Value string `protobuf:"bytes,2,opt,name=value,proto3" json:"value,omitempty"`
 }
 
-func (x *HelloRequest) Reset() {
-	*x = HelloRequest{}
+func (x *ClientDataPutReq) Reset() {
+	*x = ClientDataPutReq{}
 	if protoimpl.UnsafeEnabled {
 		mi := &file_proto_ClientData_ClientData_proto_msgTypes[0]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -61,13 +62,13 @@ func (x *HelloRequest) Reset() {
 	}
 }
 
-func (x *HelloRequest) String() string {
+func (x *ClientDataPutReq) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*HelloRequest) ProtoMessage() {}
+func (*ClientDataPutReq) ProtoMessage() {}
 
-func (x *HelloRequest) ProtoReflect() protoreflect.Message {
+func (x *ClientDataPutReq) ProtoReflect() protoreflect.Message {
 	mi := &file_proto_ClientData_ClientData_proto_msgTypes[0]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -79,20 +80,26 @@ func (x *HelloRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use HelloRequest.ProtoReflect.Descriptor instead.
-func (*HelloRequest) Descriptor() ([]byte, []int) {
+// Deprecated: Use ClientDataPutReq.ProtoReflect.Descriptor instead.
+func (*ClientDataPutReq) Descriptor() ([]byte, []int) {
 	return file_proto_ClientData_ClientData_proto_rawDescGZIP(), []int{0}
 }
 
-func (x *HelloRequest) GetName() string {
+func (x *ClientDataPutReq) GetKey() string {
 	if x != nil {
-		return x.Name
+		return x.Key
 	}
 	return ""
 }
 
-// The response message containing the greetings
-type HelloReply struct {
+func (x *ClientDataPutReq) GetValue() string {
+	if x != nil {
+		return x.Value
+	}
+	return ""
+}
+
+type ClientDataPutResp struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
@@ -100,8 +107,8 @@ type HelloReply struct {
 	Message string `protobuf:"bytes,1,opt,name=message,proto3" json:"message,omitempty"`
 }
 
-func (x *HelloReply) Reset() {
-	*x = HelloReply{}
+func (x *ClientDataPutResp) Reset() {
+	*x = ClientDataPutResp{}
 	if protoimpl.UnsafeEnabled {
 		mi := &file_proto_ClientData_ClientData_proto_msgTypes[1]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -109,13 +116,13 @@ func (x *HelloReply) Reset() {
 	}
 }
 
-func (x *HelloReply) String() string {
+func (x *ClientDataPutResp) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*HelloReply) ProtoMessage() {}
+func (*ClientDataPutResp) ProtoMessage() {}
 
-func (x *HelloReply) ProtoReflect() protoreflect.Message {
+func (x *ClientDataPutResp) ProtoReflect() protoreflect.Message {
 	mi := &file_proto_ClientData_ClientData_proto_msgTypes[1]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -127,12 +134,209 @@ func (x *HelloReply) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use HelloReply.ProtoReflect.Descriptor instead.
-func (*HelloReply) Descriptor() ([]byte, []int) {
+// Deprecated: Use ClientDataPutResp.ProtoReflect.Descriptor instead.
+func (*ClientDataPutResp) Descriptor() ([]byte, []int) {
 	return file_proto_ClientData_ClientData_proto_rawDescGZIP(), []int{1}
 }
 
-func (x *HelloReply) GetMessage() string {
+func (x *ClientDataPutResp) GetMessage() string {
+	if x != nil {
+		return x.Message
+	}
+	return ""
+}
+
+// The response message containing the greetings
+type ClientDataReadReq struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Key string `protobuf:"bytes,1,opt,name=key,proto3" json:"key,omitempty"`
+}
+
+func (x *ClientDataReadReq) Reset() {
+	*x = ClientDataReadReq{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_proto_ClientData_ClientData_proto_msgTypes[2]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *ClientDataReadReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ClientDataReadReq) ProtoMessage() {}
+
+func (x *ClientDataReadReq) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_ClientData_ClientData_proto_msgTypes[2]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ClientDataReadReq.ProtoReflect.Descriptor instead.
+func (*ClientDataReadReq) Descriptor() ([]byte, []int) {
+	return file_proto_ClientData_ClientData_proto_rawDescGZIP(), []int{2}
+}
+
+func (x *ClientDataReadReq) GetKey() string {
+	if x != nil {
+		return x.Key
+	}
+	return ""
+}
+
+type ClientDataReadResp struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Value   string `protobuf:"bytes,1,opt,name=value,proto3" json:"value,omitempty"`
+	Message string `protobuf:"bytes,2,opt,name=message,proto3" json:"message,omitempty"`
+}
+
+func (x *ClientDataReadResp) Reset() {
+	*x = ClientDataReadResp{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_proto_ClientData_ClientData_proto_msgTypes[3]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *ClientDataReadResp) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ClientDataReadResp) ProtoMessage() {}
+
+func (x *ClientDataReadResp) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_ClientData_ClientData_proto_msgTypes[3]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ClientDataReadResp.ProtoReflect.Descriptor instead.
+func (*ClientDataReadResp) Descriptor() ([]byte, []int) {
+	return file_proto_ClientData_ClientData_proto_rawDescGZIP(), []int{3}
+}
+
+func (x *ClientDataReadResp) GetValue() string {
+	if x != nil {
+		return x.Value
+	}
+	return ""
+}
+
+func (x *ClientDataReadResp) GetMessage() string {
+	if x != nil {
+		return x.Message
+	}
+	return ""
+}
+
+type ClientDataDeleteReq struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Key string `protobuf:"bytes,1,opt,name=key,proto3" json:"key,omitempty"`
+}
+
+func (x *ClientDataDeleteReq) Reset() {
+	*x = ClientDataDeleteReq{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_proto_ClientData_ClientData_proto_msgTypes[4]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *ClientDataDeleteReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ClientDataDeleteReq) ProtoMessage() {}
+
+func (x *ClientDataDeleteReq) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_ClientData_ClientData_proto_msgTypes[4]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ClientDataDeleteReq.ProtoReflect.Descriptor instead.
+func (*ClientDataDeleteReq) Descriptor() ([]byte, []int) {
+	return file_proto_ClientData_ClientData_proto_rawDescGZIP(), []int{4}
+}
+
+func (x *ClientDataDeleteReq) GetKey() string {
+	if x != nil {
+		return x.Key
+	}
+	return ""
+}
+
+type ClientDataDeleteResp struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Message string `protobuf:"bytes,1,opt,name=message,proto3" json:"message,omitempty"`
+}
+
+func (x *ClientDataDeleteResp) Reset() {
+	*x = ClientDataDeleteResp{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_proto_ClientData_ClientData_proto_msgTypes[5]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *ClientDataDeleteResp) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ClientDataDeleteResp) ProtoMessage() {}
+
+func (x *ClientDataDeleteResp) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_ClientData_ClientData_proto_msgTypes[5]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ClientDataDeleteResp.ProtoReflect.Descriptor instead.
+func (*ClientDataDeleteResp) Descriptor() ([]byte, []int) {
+	return file_proto_ClientData_ClientData_proto_rawDescGZIP(), []int{5}
+}
+
+func (x *ClientDataDeleteResp) GetMessage() string {
 	if x != nil {
 		return x.Message
 	}
@@ -145,25 +349,42 @@ var file_proto_ClientData_ClientData_proto_rawDesc = []byte{
 	0x0a, 0x21, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2f, 0x43, 0x6c, 0x69, 0x65, 0x6e, 0x74, 0x44, 0x61,
 	0x74, 0x61, 0x2f, 0x43, 0x6c, 0x69, 0x65, 0x6e, 0x74, 0x44, 0x61, 0x74, 0x61, 0x2e, 0x70, 0x72,
 	0x6f, 0x74, 0x6f, 0x12, 0x0a, 0x43, 0x6c, 0x69, 0x65, 0x6e, 0x74, 0x44, 0x61, 0x74, 0x61, 0x22,
-	0x22, 0x0a, 0x0c, 0x48, 0x65, 0x6c, 0x6c, 0x6f, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12,
-	0x12, 0x0a, 0x04, 0x6e, 0x61, 0x6d, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x04, 0x6e,
-	0x61, 0x6d, 0x65, 0x22, 0x26, 0x0a, 0x0a, 0x48, 0x65, 0x6c, 0x6c, 0x6f, 0x52, 0x65, 0x70, 0x6c,
-	0x79, 0x12, 0x18, 0x0a, 0x07, 0x6d, 0x65, 0x73, 0x73, 0x61, 0x67, 0x65, 0x18, 0x01, 0x20, 0x01,
-	0x28, 0x09, 0x52, 0x07, 0x6d, 0x65, 0x73, 0x73, 0x61, 0x67, 0x65, 0x32, 0xdf, 0x01, 0x0a, 0x0a,
-	0x43, 0x6c, 0x69, 0x65, 0x6e, 0x74, 0x44, 0x61, 0x74, 0x61, 0x12, 0x43, 0x0a, 0x0d, 0x43, 0x6c,
-	0x69, 0x65, 0x6e, 0x74, 0x44, 0x61, 0x74, 0x61, 0x50, 0x75, 0x74, 0x12, 0x18, 0x2e, 0x43, 0x6c,
-	0x69, 0x65, 0x6e, 0x74, 0x44, 0x61, 0x74, 0x61, 0x2e, 0x48, 0x65, 0x6c, 0x6c, 0x6f, 0x52, 0x65,
-	0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x16, 0x2e, 0x43, 0x6c, 0x69, 0x65, 0x6e, 0x74, 0x44, 0x61,
-	0x74, 0x61, 0x2e, 0x48, 0x65, 0x6c, 0x6c, 0x6f, 0x52, 0x65, 0x70, 0x6c, 0x79, 0x22, 0x00, 0x12,
-	0x46, 0x0a, 0x10, 0x43, 0x6c, 0x69, 0x65, 0x6e, 0x74, 0x44, 0x61, 0x74, 0x61, 0x44, 0x65, 0x6c,
-	0x65, 0x74, 0x65, 0x12, 0x18, 0x2e, 0x43, 0x6c, 0x69, 0x65, 0x6e, 0x74, 0x44, 0x61, 0x74, 0x61,
-	0x2e, 0x48, 0x65, 0x6c, 0x6c, 0x6f, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x16, 0x2e,
-	0x43, 0x6c, 0x69, 0x65, 0x6e, 0x74, 0x44, 0x61, 0x74, 0x61, 0x2e, 0x48, 0x65, 0x6c, 0x6c, 0x6f,
-	0x52, 0x65, 0x70, 0x6c, 0x79, 0x22, 0x00, 0x12, 0x44, 0x0a, 0x0e, 0x43, 0x6c, 0x69, 0x65, 0x6e,
-	0x74, 0x44, 0x61, 0x74, 0x61, 0x52, 0x65, 0x61, 0x64, 0x12, 0x18, 0x2e, 0x43, 0x6c, 0x69, 0x65,
-	0x6e, 0x74, 0x44, 0x61, 0x74, 0x61, 0x2e, 0x48, 0x65, 0x6c, 0x6c, 0x6f, 0x52, 0x65, 0x71, 0x75,
-	0x65, 0x73, 0x74, 0x1a, 0x16, 0x2e, 0x43, 0x6c, 0x69, 0x65, 0x6e, 0x74, 0x44, 0x61, 0x74, 0x61,
-	0x2e, 0x48, 0x65, 0x6c, 0x6c, 0x6f, 0x52, 0x65, 0x70, 0x6c, 0x79, 0x22, 0x00, 0x62, 0x06, 0x70,
+	0x3a, 0x0a, 0x10, 0x43, 0x6c, 0x69, 0x65, 0x6e, 0x74, 0x44, 0x61, 0x74, 0x61, 0x50, 0x75, 0x74,
+	0x52, 0x65, 0x71, 0x12, 0x10, 0x0a, 0x03, 0x6b, 0x65, 0x79, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09,
+	0x52, 0x03, 0x6b, 0x65, 0x79, 0x12, 0x14, 0x0a, 0x05, 0x76, 0x61, 0x6c, 0x75, 0x65, 0x18, 0x02,
+	0x20, 0x01, 0x28, 0x09, 0x52, 0x05, 0x76, 0x61, 0x6c, 0x75, 0x65, 0x22, 0x2d, 0x0a, 0x11, 0x43,
+	0x6c, 0x69, 0x65, 0x6e, 0x74, 0x44, 0x61, 0x74, 0x61, 0x50, 0x75, 0x74, 0x52, 0x65, 0x73, 0x70,
+	0x12, 0x18, 0x0a, 0x07, 0x6d, 0x65, 0x73, 0x73, 0x61, 0x67, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28,
+	0x09, 0x52, 0x07, 0x6d, 0x65, 0x73, 0x73, 0x61, 0x67, 0x65, 0x22, 0x25, 0x0a, 0x11, 0x43, 0x6c,
+	0x69, 0x65, 0x6e, 0x74, 0x44, 0x61, 0x74, 0x61, 0x52, 0x65, 0x61, 0x64, 0x52, 0x65, 0x71, 0x12,
+	0x10, 0x0a, 0x03, 0x6b, 0x65, 0x79, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x03, 0x6b, 0x65,
+	0x79, 0x22, 0x44, 0x0a, 0x12, 0x43, 0x6c, 0x69, 0x65, 0x6e, 0x74, 0x44, 0x61, 0x74, 0x61, 0x52,
+	0x65, 0x61, 0x64, 0x52, 0x65, 0x73, 0x70, 0x12, 0x14, 0x0a, 0x05, 0x76, 0x61, 0x6c, 0x75, 0x65,
+	0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x05, 0x76, 0x61, 0x6c, 0x75, 0x65, 0x12, 0x18, 0x0a,
+	0x07, 0x6d, 0x65, 0x73, 0x73, 0x61, 0x67, 0x65, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x07,
+	0x6d, 0x65, 0x73, 0x73, 0x61, 0x67, 0x65, 0x22, 0x27, 0x0a, 0x13, 0x43, 0x6c, 0x69, 0x65, 0x6e,
+	0x74, 0x44, 0x61, 0x74, 0x61, 0x44, 0x65, 0x6c, 0x65, 0x74, 0x65, 0x52, 0x65, 0x71, 0x12, 0x10,
+	0x0a, 0x03, 0x6b, 0x65, 0x79, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x03, 0x6b, 0x65, 0x79,
+	0x22, 0x30, 0x0a, 0x14, 0x43, 0x6c, 0x69, 0x65, 0x6e, 0x74, 0x44, 0x61, 0x74, 0x61, 0x44, 0x65,
+	0x6c, 0x65, 0x74, 0x65, 0x52, 0x65, 0x73, 0x70, 0x12, 0x18, 0x0a, 0x07, 0x6d, 0x65, 0x73, 0x73,
+	0x61, 0x67, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x07, 0x6d, 0x65, 0x73, 0x73, 0x61,
+	0x67, 0x65, 0x32, 0x88, 0x02, 0x0a, 0x0a, 0x43, 0x6c, 0x69, 0x65, 0x6e, 0x74, 0x44, 0x61, 0x74,
+	0x61, 0x12, 0x4e, 0x0a, 0x0d, 0x43, 0x6c, 0x69, 0x65, 0x6e, 0x74, 0x44, 0x61, 0x74, 0x61, 0x50,
+	0x75, 0x74, 0x12, 0x1c, 0x2e, 0x43, 0x6c, 0x69, 0x65, 0x6e, 0x74, 0x44, 0x61, 0x74, 0x61, 0x2e,
+	0x43, 0x6c, 0x69, 0x65, 0x6e, 0x74, 0x44, 0x61, 0x74, 0x61, 0x50, 0x75, 0x74, 0x52, 0x65, 0x71,
+	0x1a, 0x1d, 0x2e, 0x43, 0x6c, 0x69, 0x65, 0x6e, 0x74, 0x44, 0x61, 0x74, 0x61, 0x2e, 0x43, 0x6c,
+	0x69, 0x65, 0x6e, 0x74, 0x44, 0x61, 0x74, 0x61, 0x50, 0x75, 0x74, 0x52, 0x65, 0x73, 0x70, 0x22,
+	0x00, 0x12, 0x57, 0x0a, 0x10, 0x43, 0x6c, 0x69, 0x65, 0x6e, 0x74, 0x44, 0x61, 0x74, 0x61, 0x44,
+	0x65, 0x6c, 0x65, 0x74, 0x65, 0x12, 0x1f, 0x2e, 0x43, 0x6c, 0x69, 0x65, 0x6e, 0x74, 0x44, 0x61,
+	0x74, 0x61, 0x2e, 0x43, 0x6c, 0x69, 0x65, 0x6e, 0x74, 0x44, 0x61, 0x74, 0x61, 0x44, 0x65, 0x6c,
+	0x65, 0x74, 0x65, 0x52, 0x65, 0x71, 0x1a, 0x20, 0x2e, 0x43, 0x6c, 0x69, 0x65, 0x6e, 0x74, 0x44,
+	0x61, 0x74, 0x61, 0x2e, 0x43, 0x6c, 0x69, 0x65, 0x6e, 0x74, 0x44, 0x61, 0x74, 0x61, 0x44, 0x65,
+	0x6c, 0x65, 0x74, 0x65, 0x52, 0x65, 0x73, 0x70, 0x22, 0x00, 0x12, 0x51, 0x0a, 0x0e, 0x43, 0x6c,
+	0x69, 0x65, 0x6e, 0x74, 0x44, 0x61, 0x74, 0x61, 0x52, 0x65, 0x61, 0x64, 0x12, 0x1d, 0x2e, 0x43,
+	0x6c, 0x69, 0x65, 0x6e, 0x74, 0x44, 0x61, 0x74, 0x61, 0x2e, 0x43, 0x6c, 0x69, 0x65, 0x6e, 0x74,
+	0x44, 0x61, 0x74, 0x61, 0x52, 0x65, 0x61, 0x64, 0x52, 0x65, 0x71, 0x1a, 0x1e, 0x2e, 0x43, 0x6c,
+	0x69, 0x65, 0x6e, 0x74, 0x44, 0x61, 0x74, 0x61, 0x2e, 0x43, 0x6c, 0x69, 0x65, 0x6e, 0x74, 0x44,
+	0x61, 0x74, 0x61, 0x52, 0x65, 0x61, 0x64, 0x52, 0x65, 0x73, 0x70, 0x22, 0x00, 0x62, 0x06, 0x70,
 	0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
@@ -179,18 +400,22 @@ func file_proto_ClientData_ClientData_proto_rawDescGZIP() []byte {
 	return file_proto_ClientData_ClientData_proto_rawDescData
 }
 
-var file_proto_ClientData_ClientData_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
+var file_proto_ClientData_ClientData_proto_msgTypes = make([]protoimpl.MessageInfo, 6)
 var file_proto_ClientData_ClientData_proto_goTypes = []interface{}{
-	(*HelloRequest)(nil), // 0: ClientData.HelloRequest
-	(*HelloReply)(nil),   // 1: ClientData.HelloReply
+	(*ClientDataPutReq)(nil),     // 0: ClientData.ClientDataPutReq
+	(*ClientDataPutResp)(nil),    // 1: ClientData.ClientDataPutResp
+	(*ClientDataReadReq)(nil),    // 2: ClientData.ClientDataReadReq
+	(*ClientDataReadResp)(nil),   // 3: ClientData.ClientDataReadResp
+	(*ClientDataDeleteReq)(nil),  // 4: ClientData.ClientDataDeleteReq
+	(*ClientDataDeleteResp)(nil), // 5: ClientData.ClientDataDeleteResp
 }
 var file_proto_ClientData_ClientData_proto_depIdxs = []int32{
-	0, // 0: ClientData.ClientData.ClientDataPut:input_type -> ClientData.HelloRequest
-	0, // 1: ClientData.ClientData.ClientDataDelete:input_type -> ClientData.HelloRequest
-	0, // 2: ClientData.ClientData.ClientDataRead:input_type -> ClientData.HelloRequest
-	1, // 3: ClientData.ClientData.ClientDataPut:output_type -> ClientData.HelloReply
-	1, // 4: ClientData.ClientData.ClientDataDelete:output_type -> ClientData.HelloReply
-	1, // 5: ClientData.ClientData.ClientDataRead:output_type -> ClientData.HelloReply
+	0, // 0: ClientData.ClientData.ClientDataPut:input_type -> ClientData.ClientDataPutReq
+	4, // 1: ClientData.ClientData.ClientDataDelete:input_type -> ClientData.ClientDataDeleteReq
+	2, // 2: ClientData.ClientData.ClientDataRead:input_type -> ClientData.ClientDataReadReq
+	1, // 3: ClientData.ClientData.ClientDataPut:output_type -> ClientData.ClientDataPutResp
+	5, // 4: ClientData.ClientData.ClientDataDelete:output_type -> ClientData.ClientDataDeleteResp
+	3, // 5: ClientData.ClientData.ClientDataRead:output_type -> ClientData.ClientDataReadResp
 	3, // [3:6] is the sub-list for method output_type
 	0, // [0:3] is the sub-list for method input_type
 	0, // [0:0] is the sub-list for extension type_name
@@ -205,7 +430,7 @@ func file_proto_ClientData_ClientData_proto_init() {
 	}
 	if !protoimpl.UnsafeEnabled {
 		file_proto_ClientData_ClientData_proto_msgTypes[0].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*HelloRequest); i {
+			switch v := v.(*ClientDataPutReq); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -217,7 +442,55 @@ func file_proto_ClientData_ClientData_proto_init() {
 			}
 		}
 		file_proto_ClientData_ClientData_proto_msgTypes[1].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*HelloReply); i {
+			switch v := v.(*ClientDataPutResp); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_proto_ClientData_ClientData_proto_msgTypes[2].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*ClientDataReadReq); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_proto_ClientData_ClientData_proto_msgTypes[3].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*ClientDataReadResp); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_proto_ClientData_ClientData_proto_msgTypes[4].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*ClientDataDeleteReq); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_proto_ClientData_ClientData_proto_msgTypes[5].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*ClientDataDeleteResp); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -235,7 +508,7 @@ func file_proto_ClientData_ClientData_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_proto_ClientData_ClientData_proto_rawDesc,
 			NumEnums:      0,
-			NumMessages:   2,
+			NumMessages:   6,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
@@ -262,9 +535,9 @@ const _ = grpc.SupportPackageIsVersion6
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type ClientDataClient interface {
 	// Sends a greeting
-	ClientDataPut(ctx context.Context, in *HelloRequest, opts ...grpc.CallOption) (*HelloReply, error)
-	ClientDataDelete(ctx context.Context, in *HelloRequest, opts ...grpc.CallOption) (*HelloReply, error)
-	ClientDataRead(ctx context.Context, in *HelloRequest, opts ...grpc.CallOption) (*HelloReply, error)
+	ClientDataPut(ctx context.Context, in *ClientDataPutReq, opts ...grpc.CallOption) (*ClientDataPutResp, error)
+	ClientDataDelete(ctx context.Context, in *ClientDataDeleteReq, opts ...grpc.CallOption) (*ClientDataDeleteResp, error)
+	ClientDataRead(ctx context.Context, in *ClientDataReadReq, opts ...grpc.CallOption) (*ClientDataReadResp, error)
 }
 
 type clientDataClient struct {
@@ -275,8 +548,8 @@ func NewClientDataClient(cc grpc.ClientConnInterface) ClientDataClient {
 	return &clientDataClient{cc}
 }
 
-func (c *clientDataClient) ClientDataPut(ctx context.Context, in *HelloRequest, opts ...grpc.CallOption) (*HelloReply, error) {
-	out := new(HelloReply)
+func (c *clientDataClient) ClientDataPut(ctx context.Context, in *ClientDataPutReq, opts ...grpc.CallOption) (*ClientDataPutResp, error) {
+	out := new(ClientDataPutResp)
 	err := c.cc.Invoke(ctx, "/ClientData.ClientData/ClientDataPut", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -284,8 +557,8 @@ func (c *clientDataClient) ClientDataPut(ctx context.Context, in *HelloRequest, 
 	return out, nil
 }
 
-func (c *clientDataClient) ClientDataDelete(ctx context.Context, in *HelloRequest, opts ...grpc.CallOption) (*HelloReply, error) {
-	out := new(HelloReply)
+func (c *clientDataClient) ClientDataDelete(ctx context.Context, in *ClientDataDeleteReq, opts ...grpc.CallOption) (*ClientDataDeleteResp, error) {
+	out := new(ClientDataDeleteResp)
 	err := c.cc.Invoke(ctx, "/ClientData.ClientData/ClientDataDelete", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -293,8 +566,8 @@ func (c *clientDataClient) ClientDataDelete(ctx context.Context, in *HelloReques
 	return out, nil
 }
 
-func (c *clientDataClient) ClientDataRead(ctx context.Context, in *HelloRequest, opts ...grpc.CallOption) (*HelloReply, error) {
-	out := new(HelloReply)
+func (c *clientDataClient) ClientDataRead(ctx context.Context, in *ClientDataReadReq, opts ...grpc.CallOption) (*ClientDataReadResp, error) {
+	out := new(ClientDataReadResp)
 	err := c.cc.Invoke(ctx, "/ClientData.ClientData/ClientDataRead", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -305,22 +578,22 @@ func (c *clientDataClient) ClientDataRead(ctx context.Context, in *HelloRequest,
 // ClientDataServer is the server API for ClientData service.
 type ClientDataServer interface {
 	// Sends a greeting
-	ClientDataPut(context.Context, *HelloRequest) (*HelloReply, error)
-	ClientDataDelete(context.Context, *HelloRequest) (*HelloReply, error)
-	ClientDataRead(context.Context, *HelloRequest) (*HelloReply, error)
+	ClientDataPut(context.Context, *ClientDataPutReq) (*ClientDataPutResp, error)
+	ClientDataDelete(context.Context, *ClientDataDeleteReq) (*ClientDataDeleteResp, error)
+	ClientDataRead(context.Context, *ClientDataReadReq) (*ClientDataReadResp, error)
 }
 
 // UnimplementedClientDataServer can be embedded to have forward compatible implementations.
 type UnimplementedClientDataServer struct {
 }
 
-func (*UnimplementedClientDataServer) ClientDataPut(context.Context, *HelloRequest) (*HelloReply, error) {
+func (*UnimplementedClientDataServer) ClientDataPut(context.Context, *ClientDataPutReq) (*ClientDataPutResp, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ClientDataPut not implemented")
 }
-func (*UnimplementedClientDataServer) ClientDataDelete(context.Context, *HelloRequest) (*HelloReply, error) {
+func (*UnimplementedClientDataServer) ClientDataDelete(context.Context, *ClientDataDeleteReq) (*ClientDataDeleteResp, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ClientDataDelete not implemented")
 }
-func (*UnimplementedClientDataServer) ClientDataRead(context.Context, *HelloRequest) (*HelloReply, error) {
+func (*UnimplementedClientDataServer) ClientDataRead(context.Context, *ClientDataReadReq) (*ClientDataReadResp, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ClientDataRead not implemented")
 }
 
@@ -329,7 +602,7 @@ func RegisterClientDataServer(s *grpc.Server, srv ClientDataServer) {
 }
 
 func _ClientData_ClientDataPut_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(HelloRequest)
+	in := new(ClientDataPutReq)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -341,13 +614,13 @@ func _ClientData_ClientDataPut_Handler(srv interface{}, ctx context.Context, dec
 		FullMethod: "/ClientData.ClientData/ClientDataPut",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ClientDataServer).ClientDataPut(ctx, req.(*HelloRequest))
+		return srv.(ClientDataServer).ClientDataPut(ctx, req.(*ClientDataPutReq))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
 func _ClientData_ClientDataDelete_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(HelloRequest)
+	in := new(ClientDataDeleteReq)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -359,13 +632,13 @@ func _ClientData_ClientDataDelete_Handler(srv interface{}, ctx context.Context, 
 		FullMethod: "/ClientData.ClientData/ClientDataDelete",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ClientDataServer).ClientDataDelete(ctx, req.(*HelloRequest))
+		return srv.(ClientDataServer).ClientDataDelete(ctx, req.(*ClientDataDeleteReq))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
 func _ClientData_ClientDataRead_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(HelloRequest)
+	in := new(ClientDataReadReq)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -377,7 +650,7 @@ func _ClientData_ClientDataRead_Handler(srv interface{}, ctx context.Context, de
 		FullMethod: "/ClientData.ClientData/ClientDataRead",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ClientDataServer).ClientDataRead(ctx, req.(*HelloRequest))
+		return srv.(ClientDataServer).ClientDataRead(ctx, req.(*ClientDataReadReq))
 	}
 	return interceptor(ctx, in, info, handler)
 }
