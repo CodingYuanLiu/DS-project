@@ -3,6 +3,7 @@ package main
 import(
 	clientDataPb "FinalProject/proto/ClientData"
 	"context"
+	"errors"
 	"fmt"
 	"google.golang.org/grpc"
 	"log"
@@ -25,6 +26,33 @@ func (clientDataServer *ClientDataServer) ClientDataPut(ctx context.Context, req
 	return &clientDataPb.ClientDataPutResp{
 		Message: "[Data server]: put succeed",
 	}, nil
+}
+
+func (clientDataServer *ClientDataServer) ClientDataRead(ctx context.Context, req *clientDataPb.ClientDataReadReq) (*clientDataPb.ClientDataReadResp, error){
+	value, exist := clientDataServer.database[req.Key]
+
+	if !exist{
+		return nil, errors.New("no value in the database")
+	}
+
+	log.Printf("read key: %v, value: %v\n", req.Key, value)
+	log.Println(clientDataServer.database)
+	return &clientDataPb.ClientDataReadResp{
+		Value: value,
+		Message: "[Data server]: read succeed",
+	}, nil
+}
+
+func (clientDataServer *ClientDataServer) ClientDataDelete(ctx context.Context, req *clientDataPb.ClientDataDeleteReq) (*clientDataPb.ClientDataDeleteResp, error){
+	_, exist := clientDataServer.database[req.Key]
+	if !exist{
+		return nil, errors.New("no value in the database")
+	}
+	delete(clientDataServer.database, req.Key)
+	return &clientDataPb.ClientDataDeleteResp{
+		Message: "[Data server]: delete succeed",
+	}, nil
+
 }
 
 func main() {

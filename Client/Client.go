@@ -32,17 +32,27 @@ func NewClient() *Client{
 	}
 }
 
-func (cli *Client) Put(key string, value string) error {
+func (cli *Client) GetDataNodePort(key string) (string,error){
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 	defer cancel()
 	masterResp, err := cli.rpcMasterCli.ClientMasterPut(ctx, &clientMasterPb.ClientMasterPutReq{
 		Key: "World",
 	})
 	if err != nil{
+		return "", err
+	}
+	return masterResp.Port, nil
+}
+func (cli *Client) Put(key string, value string) error {
+	port, err := cli.GetDataNodePort(key)
+	if err != nil{
 		log.Fatalf("Get data node from master.exe error: %v\n", err)
 		return err
 	}
-	dataCli := cli.GetDataCli(masterResp.Port)
+
+	dataCli := cli.GetDataCli(port)
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+	defer cancel()
 	dataResp, err := dataCli.ClientDataPut(ctx, &clientDataPb.ClientDataPutReq{
 		Key: key,
 		Value: value,
@@ -51,10 +61,55 @@ func (cli *Client) Put(key string, value string) error {
 		log.Fatalf("Put key-value to data node error: %v\n", err)
 		return err
 	}
-	log.Printf("Put %v:%v to data node (port \"%v\") succeed\nmessage: %v\n",
-		key, value, masterResp.Port, dataResp.Message)
-	return nil
 
+	log.Printf("Put %v:%v to data node (port \"%v\") succeed\nmessage: %v\n",
+		key, value, port, dataResp.Message)
+	return nil
+}
+
+func (cli *Client) Read(key string) (string, error){
+	port, err := cli.GetDataNodePort(key)
+	if err != nil{
+		log.Fatalf("Get data node from master.exe error: %v\n", err)
+		return "", err
+	}
+
+	dataCli := cli.GetDataCli(port)
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+	defer cancel()
+	dataResp, err := dataCli.ClientDataRead(ctx, &clientDataPb.ClientDataReadReq{
+		Key: key,
+	})
+	if err != nil{
+		log.Printf("Put key-value to data node error: %v\n", err)
+		return "", err
+	}
+	value := dataResp.Value
+	log.Printf("Read %v:%v from data node (port \"%v\") succeed\nmessage: %v\n",
+		key, value, port, dataResp.Message)
+	return value, nil
+}
+
+func (cli *Client) Delete(key string) error{
+	port, err := cli.GetDataNodePort(key)
+	if err != nil{
+		log.Fatalf("Get data node from master error: %v\n", err)
+		return err
+	}
+
+	dataCli := cli.GetDataCli(port)
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+	defer cancel()
+	dataResp, err := dataCli.ClientDataDelete(ctx, &clientDataPb.ClientDataDeleteReq{
+		Key: key,
+	})
+	if err != nil{
+		log.Printf("Put key-value to data node error: %v\n", err)
+		return err
+	}
+	log.Printf("Delete %v from data node (port \"%v\") succeed\nmessage: %v\n",
+		key, port, dataResp.Message)
+	return nil
 }
 
 func (cli *Client) GetDataCli(port string) clientDataPb.ClientDataClient{
@@ -73,7 +128,7 @@ func (cli *Client) GetDataCli(port string) clientDataPb.ClientDataClient{
 
 	return client
 }
-
+/*
 func main() {
 	cli := NewClient()
 	if err := cli.Put("1", "value1"); err != nil{
@@ -83,3 +138,4 @@ func main() {
 		log.Fatal(err)
 	}
 }
+*/
