@@ -30,7 +30,6 @@ func (s *server) SayHelloTwice(ctx context.Context, in *pb.HelloRequest) (*pb.He
 }
 
 func main(){
-	sayHelloworld()
 	lis,err := net.Listen("tcp", port)
 	if err != nil{
 		log.Fatalf("failed to listen %v\n", err)

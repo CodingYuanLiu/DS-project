@@ -18,17 +18,37 @@ package MasterData;
 // The greeting service definition.
 service MasterData {
   // Sends a greeting
-  rpc MasterDataPut (HelloRequest) returns (HelloReply) {}
-  rpc MasterDataDelete (HelloRequest) returns (HelloReply) {}
-  rpc MasterDataRead (HelloRequest) returns (HelloReply) {}
+  rpc MasterDataPut (MasterDataPutReq) returns (MasterDataPutResp) {}
+  rpc MasterDataDelete (MasterDataDeleteReq) returns (MasterDataDeleteResp) {}
+  rpc MasterDataRead (MasterDataReadReq) returns (MasterDataReadResp) {}
 }
 
 // The request message containing the user's name.
-message HelloRequest {
+message MasterDataPutReq {
   string name = 1;
 }
 
 // The response message containing the greetings
-message HelloReply {
+message MasterDataPutResp {
   string message = 1;
 }
+
+message MasterDataDeleteReq {
+  string name = 1;
+}
+
+// The response message containing the greetings
+message MasterDataDeleteResp {
+  string message = 1;
+}
+
+
+message MasterDataReadReq {
+  string name = 1;
+}
+
+// The response message containing the greetings
+message MasterDataReadResp {
+  string message = 1;
+}
+
