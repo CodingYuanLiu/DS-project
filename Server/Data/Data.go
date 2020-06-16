@@ -5,13 +5,18 @@ import(
 	"context"
 	"errors"
 	"fmt"
+	"github.com/samuel/go-zookeeper/zk"
 	"google.golang.org/grpc"
 	"log"
 	"net"
 	"os"
+	"time"
 )
 const(
 	port1 = ":7777"
+	dataNodesPath = "/DataNode" //The root node of the data nodes' ports
+	aliveResp = "Alive"
+	aliveReq = "Is alive?"
 )
 
 type ClientDataServer struct{
@@ -55,6 +60,65 @@ func (clientDataServer *ClientDataServer) ClientDataDelete(ctx context.Context, 
 
 }
 
+func ConnectZookeeper() *zk.Conn{
+	hosts := []string{"localhost:2181", "localhost:2182", "localhost:2183"}
+
+	zkConn, _, err := zk.Connect(hosts, time.Second * 5)
+	if err != nil {
+		fmt.Println(err)
+		return nil
+	}
+	fmt.Println("Zookeeper connected")
+	return zkConn
+}
+
+func ZkRegisterDataNodePort(conn *zk.Conn, port string) error{
+	path := fmt.Sprintf("%v/%v", dataNodesPath, port)
+	exist, _, err := conn.Exists(path)
+	if err != nil{
+		return err
+ 	} else if exist{
+ 		return errors.New("the data node already exists in the zookeeper")
+	}
+
+	_, err = conn.Create(path, []byte("Alive"), 0, zk.WorldACL(zk.PermAll))
+	if err != nil{
+		return err
+	}
+	return nil
+}
+
+func HeartBeatResponse(conn *zk.Conn, port string) error{
+	path := fmt.Sprintf("%v/%v", dataNodesPath, port)
+	exist, _, err := conn.Exists(path)
+	if !exist{
+		return errors.New("the data node does not exist in the zookeeper")
+	} else if err != nil{
+		return err
+	}
+
+	for {
+		_, s, getCh, err := conn.GetW(path)
+		if err != nil {
+			fmt.Printf("watch node error: %v\n", err)
+			return err
+		}
+
+		select {
+		case chEvent := <- getCh:
+			{
+				if chEvent.Type == zk.EventNodeDataChanged {
+					log.Printf("heart beat on port %v suceed\n", port)
+					_, err := conn.Set(path, []byte(aliveResp), s.Version + 1)
+					if err != nil{
+						log.Printf("Error to set heart beat detection response: %v\n", err)
+					}
+				}
+			}
+		}
+	}
+}
+
 func main() {
 	port := port1
 	if len(os.Args) > 1 {
@@ -67,6 +131,13 @@ func main() {
 		log.Fatal(err)
 	}
 	dataServer := grpc.NewServer()
+	zkConn := ConnectZookeeper()
+
+	err = ZkRegisterDataNodePort(zkConn, port)
+	go HeartBeatResponse(zkConn, port)
+	if err != nil{
+		log.Fatalf("Register data node to zookeeper error: %v\n", err)
+	}
 
 	clientDataPb.RegisterClientDataServer(dataServer, &ClientDataServer{
 		database: map[string]string{},

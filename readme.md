@@ -10,5 +10,12 @@
  
 ## Day2
  * zookeeper实现简单动态nameservice注册，但不支持reshard，也不加锁，可能会导致并发错误。（后面补充）
- * zookeeper实现简单lock service实现读写锁。
+ * 实现了心跳检测，暂定每2s心跳检测一次。如果一个data node 2s都未回应则认为他挂掉了，删除其zk里面的节点以及注册在hashring里面的节点
+    * 检测方法：dataNodeManager修改data node在zookeeper里面节点的值为"Is alive?"，data node监听到这个修改之后将这个值改成"Alive". dataNodeManager在下一次修改前，读到这个value是"Alive"就知道检测成功了。
+    * 没有考虑data node挂掉的时候是接受任务会导致任务被分配到挂掉的节点的问题。  
+ * NameService的监听，心跳检测的发送和接受，使用了go routine。
  
+## Day3 
+ * 实现读写锁满足多client运行 
+ * 尝试着开始实现client运行过程中加入新节点的情况。需要重新注册和reshard
+ * 先不考虑容错。
