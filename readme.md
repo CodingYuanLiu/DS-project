@@ -19,5 +19,10 @@
  * 实现读写锁满足多client运行 
     * zookeeper的锁是以节点为准，而不是以lock object（指针）为准的，i.e., 即使是两个不同的lock object，如果指向同一个节点也可以lock。
     每次newLock生成的lock只能lock一次，否则将抛出死锁错误。所以我们不能使用共享的reader lock和writer lock
-    * 对于reader lock，它的lock 和 unlock在一个函数里面，因此直接新生成一把锁去lock和unlock readerlock节点就行。
-    * 对于writer lock，我们在锁它之后
+    * 因此，我们让每个client都拥有一把读锁和写锁，指向zookeeper，这样就可以进行分布式加锁放锁了。但是，读写锁需要维护一个reader的数量，用来判断是否需要lock/unlock写锁。因此这个全局的reader数量把它放到一个zookeeper一个全局节点里面，用于进程间共享。这个节点的初始化由data/master server来做(master server初始化根节点`/readers`, data server初始化自己的port, 这设计的不是很好，后面可以改一下）。
+    * 不知道这个测试应该怎么写比较好。瞎jb写了一个测试，似乎是可以跑了。
+    
+## Day4
+ * 尝试实现data 节点的扩容。扩容要考虑
+   1. 怎么加锁。怎么保证
+   2. 

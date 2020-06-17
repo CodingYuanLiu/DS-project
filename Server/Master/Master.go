@@ -68,9 +68,12 @@ func main(){
 
 	zkConn := ConnectZookeeper()
 	defer zkConn.Close()
-
+	dataNodeManager, err := NewDataNodeManager(zkConn)
+	if err != nil{
+		log.Fatalf("fail to initialize data node manager: %v", err)
+	}
 	masterServer := Master{
-		dataNodeManager: NewDataNodeManager(zkConn),
+		dataNodeManager: dataNodeManager,
 	}
 
 	go masterServer.WatchNewNode(zkConn, dataNodesPath)

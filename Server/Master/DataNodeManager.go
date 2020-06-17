@@ -1,6 +1,7 @@
 package main
 
 import (
+	"FinalProject/lock"
 	"errors"
 	"fmt"
 	"github.com/samuel/go-zookeeper/zk"
@@ -31,17 +32,21 @@ type DataNode struct{
 }
 */
 
-func NewDataNodeManager(conn *zk.Conn) *DataNodeManager{
+func NewDataNodeManager(conn *zk.Conn) (*DataNodeManager, error){
 	hashRing := NewHashRing(100)
 	//nodeMeta := map[uuid.UUID]*DataNode{}
 	nodeNum := 0
+	_, err := conn.Create(lock.ReaderNumRootPath, []byte{}, 0, zk.WorldACL(zk.PermAll))
+	if err != nil{
+		return nil, err
+	}
 	return &DataNodeManager{
 		hashRing: hashRing,
 		//nodeMeta: nodeMeta,
 		nodeNum: nodeNum,
 		dataNodesSet: map[string]int{},
 		conn: conn,
-	}
+	}, nil
 }
 
 /*
@@ -129,7 +134,7 @@ func (dataNodeManager DataNodeManager)HeartBeatDetection(port string) error{
 func (dataNodeManager DataNodeManager) HandleDataNodesChanges(ports []string) error{
 	//log.Printf("Node num: %d, ports: %v\n", dataNodeManager.nodeNum, ports)
 	//Node delete
-	log.Printf("Handle DataNode Changes:\nnew ports: %v, old ports: %v\n", ports, dataNodeManager.dataNodesSet)
+	log.Printf("[Debug] Handle DataNode Changes: new ports: %v, old ports: %v\n", ports, dataNodeManager.dataNodesSet)
 	if len(ports) < dataNodeManager.nodeNum{
 		newPortsMap := map[string] bool{}
 		for _, port := range ports{
@@ -192,7 +197,7 @@ func (dataNodeManager *DataNodeManager) WatchNewNode(conn *zk.Conn, path string)
 					if err != nil{
 						return err
 					}
-					fmt.Printf("value of path[%s]=[%s].\n", path, v)
+					fmt.Printf("[Debug] value of path[%s]=[%s].\n", path, v)
 					if err := dataNodeManager.HandleDataNodesChanges(v); err != nil{
 						log.Printf("Handle data nodes change error: %v\n", err)
 					}

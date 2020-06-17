@@ -31,6 +31,7 @@ func NewClient() *Client{
 	return &Client{
 		rpcMasterCli: client,
 		rpcDataCli: map[string] clientDataPb.ClientDataClient{},
+		rwLocks: map[string] lock.RwLock{},
 	}
 }
 
@@ -53,17 +54,29 @@ func (cli *Client) Put(key string, value string) error {
 	}
 
 	dataCli := cli.GetDataCli(port)
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 5 * time.Second)
 	defer cancel()
+
+	rwLock := cli.GetRwLock(port)
+	if err := rwLock.LockWriter(); err!= nil{
+		return err
+	}
+
 	dataResp, err := dataCli.ClientDataPut(ctx, &clientDataPb.ClientDataPutReq{
 		Key: key,
 		Value: value,
 	})
 	if err != nil{
+		if err := rwLock.UnlockWriter(); err!= nil{
+			return err
+		}
 		log.Fatalf("Put key-value to data node error: %v\n", err)
 		return err
 	}
 
+	if err := rwLock.UnlockWriter(); err!= nil{
+		return err
+	}
 	log.Printf("Put %v:%v to data node (port \"%v\") succeed\nmessage: %v\n",
 		key, value, port, dataResp.Message)
 	return nil
@@ -77,13 +90,25 @@ func (cli *Client) Read(key string) (string, error){
 	}
 
 	dataCli := cli.GetDataCli(port)
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 5 * time.Second)
 	defer cancel()
+
+	rwLock := cli.GetRwLock(port)
+	if err := rwLock.LockReader(); err!= nil{
+		return "", err
+	}
+
 	dataResp, err := dataCli.ClientDataRead(ctx, &clientDataPb.ClientDataReadReq{
 		Key: key,
 	})
 	if err != nil{
 		log.Printf("Put key-value to data node error: %v\n", err)
+		if err := rwLock.UnlockReader(); err!= nil{
+			return "", err
+		}
+		return "", err
+	}
+	if err := rwLock.UnlockReader(); err!= nil{
 		return "", err
 	}
 	value := dataResp.Value
@@ -100,13 +125,25 @@ func (cli *Client) Delete(key string) error{
 	}
 
 	dataCli := cli.GetDataCli(port)
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 5 * time.Second)
 	defer cancel()
+
+	rwLock := cli.GetRwLock(port)
+	if err := rwLock.LockWriter(); err!= nil{
+		return err
+	}
+
 	dataResp, err := dataCli.ClientDataDelete(ctx, &clientDataPb.ClientDataDeleteReq{
 		Key: key,
 	})
 	if err != nil{
 		log.Printf("Put key-value to data node error: %v\n", err)
+		if err := rwLock.UnlockWriter(); err!= nil{
+			return err
+		}
+		return err
+	}
+	if err := rwLock.UnlockWriter(); err!= nil{
 		return err
 	}
 	log.Printf("Delete %v from data node (port \"%v\") succeed\nmessage: %v\n",
@@ -131,15 +168,14 @@ func (cli *Client) GetDataCli(port string) clientDataPb.ClientDataClient{
 	return client
 }
 
-/*
-func (cli *Client) GetLock(port string) lock.RwLock{
+func (cli *Client) GetRwLock(port string) lock.RwLock{
 	rwLock, exist := cli.rwLocks[port]
 	if !exist{
 		rwLock = lock.NewRwLock(port)
-		cli.rwLocks[]
+		cli.rwLocks[port] = rwLock
 	}
+	return rwLock
 }
-*/
 
 /*
 func main() {
