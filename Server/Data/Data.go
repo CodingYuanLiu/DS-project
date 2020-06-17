@@ -1,6 +1,7 @@
 package main
 
 import(
+	"FinalProject/lock"
 	clientDataPb "FinalProject/proto/ClientData"
 	"context"
 	"errors"
@@ -21,11 +22,23 @@ const(
 
 type ClientDataServer struct{
 	clientDataPb.UnimplementedClientDataServer
+	rwLock	lock.RwLock
 	database map[string] string
 }
 
 func (clientDataServer *ClientDataServer) ClientDataPut(ctx context.Context, req *clientDataPb.ClientDataPutReq) (*clientDataPb.ClientDataPutResp, error){
+	err := clientDataServer.rwLock.LockWriter()
+	if err != nil{
+		return nil, err
+	}
+
 	clientDataServer.database[req.Key] = req.Value
+
+	err = clientDataServer.rwLock.UnlockWriter()
+	if err != nil{
+		return nil, err
+	}
+
 	log.Printf("put key: %v, value: %v\n", req.Key, req.Value)
 	log.Println(clientDataServer.database)
 	return &clientDataPb.ClientDataPutResp{
@@ -34,10 +47,23 @@ func (clientDataServer *ClientDataServer) ClientDataPut(ctx context.Context, req
 }
 
 func (clientDataServer *ClientDataServer) ClientDataRead(ctx context.Context, req *clientDataPb.ClientDataReadReq) (*clientDataPb.ClientDataReadResp, error){
+	err := clientDataServer.rwLock.LockReader()
+	if err != nil{
+		return nil, err
+	}
 	value, exist := clientDataServer.database[req.Key]
 
 	if !exist{
+		err := clientDataServer.rwLock.UnlockReader()
+		if err != nil{
+			return nil, err
+		}
 		return nil, errors.New("no value in the database")
+	}
+
+	err = clientDataServer.rwLock.UnlockReader()
+	if err != nil{
+		return nil, err
 	}
 
 	log.Printf("read key: %v, value: %v\n", req.Key, value)
@@ -49,11 +75,23 @@ func (clientDataServer *ClientDataServer) ClientDataRead(ctx context.Context, re
 }
 
 func (clientDataServer *ClientDataServer) ClientDataDelete(ctx context.Context, req *clientDataPb.ClientDataDeleteReq) (*clientDataPb.ClientDataDeleteResp, error){
+	err := clientDataServer.rwLock.LockWriter()
+	if err != nil{
+		return nil, err
+	}
 	_, exist := clientDataServer.database[req.Key]
 	if !exist{
+		err = clientDataServer.rwLock.UnlockWriter()
+		if err != nil{
+			return nil, err
+		}
 		return nil, errors.New("no value in the database")
 	}
 	delete(clientDataServer.database, req.Key)
+	err = clientDataServer.rwLock.UnlockWriter()
+	if err != nil{
+		return nil, err
+	}
 	return &clientDataPb.ClientDataDeleteResp{
 		Message: "[Data server]: delete succeed",
 	}, nil
@@ -141,6 +179,7 @@ func main() {
 
 	clientDataPb.RegisterClientDataServer(dataServer, &ClientDataServer{
 		database: map[string]string{},
+		rwLock: lock.NewRwLock(),
 	})
 	if err = dataServer.Serve(lis); err != nil{
 		log.Fatal(err)

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"FinalProject/lock"
 	clientDataPb "FinalProject/proto/ClientData"
 	clientMasterPb "FinalProject/proto/ClientMaster"
 	"context"
@@ -18,6 +19,7 @@ const(
 type Client struct{
 	rpcMasterCli  clientMasterPb.ClientMasterClient
 	rpcDataCli  map[string] clientDataPb.ClientDataClient //key-value : port-client
+	rwLocks map[string] lock.RwLock //stores the locks of all the data nodes. key-value : port-lock
 }
 
 func NewClient() *Client{
@@ -35,8 +37,8 @@ func NewClient() *Client{
 func (cli *Client) GetDataNodePort(key string) (string,error){
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 	defer cancel()
-	masterResp, err := cli.rpcMasterCli.ClientMasterPut(ctx, &clientMasterPb.ClientMasterPutReq{
-		Key: "World",
+	masterResp, err := cli.rpcMasterCli.ClientMasterFindDataNode(ctx, &clientMasterPb.ClientMasterFindDataNodeReq{
+		Key: key,
 	})
 	if err != nil{
 		return "", err
@@ -46,7 +48,7 @@ func (cli *Client) GetDataNodePort(key string) (string,error){
 func (cli *Client) Put(key string, value string) error {
 	port, err := cli.GetDataNodePort(key)
 	if err != nil{
-		log.Fatalf("Get data node from master.exe error: %v\n", err)
+		log.Fatalf("Get data node from master error: %v\n", err)
 		return err
 	}
 
@@ -128,6 +130,17 @@ func (cli *Client) GetDataCli(port string) clientDataPb.ClientDataClient{
 
 	return client
 }
+
+/*
+func (cli *Client) GetLock(port string) lock.RwLock{
+	rwLock, exist := cli.rwLocks[port]
+	if !exist{
+		rwLock = lock.NewRwLock(port)
+		cli.rwLocks[]
+	}
+}
+*/
+
 /*
 func main() {
 	cli := NewClient()

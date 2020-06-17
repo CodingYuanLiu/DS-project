@@ -1,11 +1,11 @@
 package main
 
 import (
-	"fmt"
 	"testing"
 )
 
 func TestDataNodeManager_FindDataNode(t *testing.T) {
+	/*
 	dataNodeManager := NewDataNodeManager()
 	_ = dataNodeManager.RegisterDataNode(":7777")
 	_ = dataNodeManager.RegisterDataNode(":2200")
@@ -25,5 +25,5 @@ func TestDataNodeManager_FindDataNode(t *testing.T) {
 	fmt.Println(str)
 	str, _ = dataNodeManager.FindDataNode("asdgzxb4")
 	fmt.Println(str)
-
+	*/
 }

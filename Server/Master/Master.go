@@ -24,55 +24,17 @@ type Master struct{
 	dataNodeManager *DataNodeManager //key:value => ID:port
 }
 
-func (master *Master) ClientMasterPut(ctx context.Context, req *clientMasterPb.ClientMasterPutReq) (*clientMasterPb.ClientMasterPutResp, error){
+func (master *Master) ClientMasterFindDataNode(ctx context.Context, req *clientMasterPb.ClientMasterFindDataNodeReq) (*clientMasterPb.ClientMasterFindDataNodeResp, error){
 	log.Printf("Serve client...")
 
 	dataPort, err := master.dataNodeManager.FindDataNode(req.Key)
 	if err != nil{
-		log.Fatalf("Find data node error: %v\n", err)
+		log.Printf("Find data node error: %v\n", err)
+		return nil, err
 	}
-	return &clientMasterPb.ClientMasterPutResp{
+	return &clientMasterPb.ClientMasterFindDataNodeResp{
 		Port: dataPort,
 	}, nil
-}
-
-func (master *Master) WatchNewNode(conn *zk.Conn, path string) error {
-	exist, _, err := conn.Exists(path)
-	if err != nil{
-		fmt.Println(err)
-	}
-	if !exist{
-		_, err = conn.Create(path, []byte{}, 0, zk.WorldACL(zk.PermAll))
-		if err != nil && err != zk.ErrNodeExists {
-			return err
-		}
-		log.Printf("Register Root data node in zookeeper: %s, node is created\n", path)
-	}
-
-	for {
-		_, _, getCh, err := conn.ChildrenW(path)
-		if err != nil {
-			fmt.Printf("watch children error: %v\n", err)
-		}
-
-		select {
-			case chEvent := <- getCh:
-			{
-				fmt.Printf("%+v\n", chEvent)
-				if chEvent.Type == zk.EventNodeChildrenChanged {
-					fmt.Printf("detect data node changed on zookeeper\n")
-					v,_, err := conn.Children(path)
-					if err != nil{
-						return err
-					}
-					fmt.Printf("value of path[%s]=[%s].\n", path, v)
-					master.dataNodeManager.HandleDataNodesChanges(v)
-				} else{
-					fmt.Printf("other events on path %s\n", chEvent.Path)
-				}
-			}
-		}
-	}
 }
 
 func ConnectZookeeper() *zk.Conn{
@@ -86,6 +48,15 @@ func ConnectZookeeper() *zk.Conn{
 	}
 	fmt.Println("Zookeeper connected")
 	return zkConn
+}
+
+func (master *Master) WatchNewNode(conn *zk.Conn, path string) error{
+	err := master.dataNodeManager.WatchNewNode(conn, path)
+	if err != nil{
+		log.Printf("Master: watch new node error: %v\n", err)
+		return err
+	}
+	return nil
 }
 
 func main(){

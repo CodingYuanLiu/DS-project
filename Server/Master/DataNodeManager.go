@@ -87,6 +87,7 @@ func (dataNodeManager DataNodeManager)RegisterDataNode(port string) error{
 }
 
 func (dataNodeManager DataNodeManager)HeartBeatDetection(port string) error{
+	log.Printf("Start to do heart beat detection on port: %v\n", port)
 	nodePath := fmt.Sprintf("%v/%v", dataNodesPath, port)
 	zkNodeExist, _, _ := dataNodeManager.conn.Exists(nodePath)
 	_, dataNodeExist := dataNodeManager.dataNodesSet[port]
@@ -113,6 +114,7 @@ func (dataNodeManager DataNodeManager)HeartBeatDetection(port string) error{
 					return err
 				}
 				delete(dataNodeManager.dataNodesSet, port)
+				dataNodeManager.hashRing.RemoveNode(port)
 				break
 			}
 		} else{
@@ -127,6 +129,7 @@ func (dataNodeManager DataNodeManager)HeartBeatDetection(port string) error{
 func (dataNodeManager DataNodeManager) HandleDataNodesChanges(ports []string) error{
 	//log.Printf("Node num: %d, ports: %v\n", dataNodeManager.nodeNum, ports)
 	//Node delete
+	log.Printf("Handle DataNode Changes:\nnew ports: %v, old ports: %v\n", ports, dataNodeManager.dataNodesSet)
 	if len(ports) < dataNodeManager.nodeNum{
 		newPortsMap := map[string] bool{}
 		for _, port := range ports{
@@ -160,7 +163,52 @@ func (dataNodeManager DataNodeManager) HandleDataNodesChanges(ports []string) er
 	return nil
 }
 
+func (dataNodeManager *DataNodeManager) WatchNewNode(conn *zk.Conn, path string) error {
+	exist, _, err := conn.Exists(path)
+	if err != nil{
+		fmt.Println(err)
+	}
+	if !exist{
+		_, err = conn.Create(path, []byte{}, 0, zk.WorldACL(zk.PermAll))
+		if err != nil && err != zk.ErrNodeExists {
+			return err
+		}
+		log.Printf("Register Root data node in zookeeper: %s, node is created\n", path)
+	}
+
+	for {
+		_, _, getCh, err := conn.ChildrenW(path)
+		if err != nil {
+			fmt.Printf("watch children error: %v\n", err)
+		}
+
+		select {
+		case chEvent := <- getCh:
+			{
+				fmt.Printf("%+v\n", chEvent)
+				if chEvent.Type == zk.EventNodeChildrenChanged {
+					fmt.Printf("detect data node changed on zookeeper\n")
+					v,_, err := conn.Children(path)
+					if err != nil{
+						return err
+					}
+					fmt.Printf("value of path[%s]=[%s].\n", path, v)
+					if err := dataNodeManager.HandleDataNodesChanges(v); err != nil{
+						log.Printf("Handle data nodes change error: %v\n", err)
+					}
+				} else{
+					fmt.Printf("other events on path %s\n", chEvent.Path)
+				}
+			}
+		}
+	}
+}
 
 func (dataNodeManager DataNodeManager)FindDataNode(key string) (string, error){
-	return dataNodeManager.hashRing.GetNode(key), nil
+	dataNode := dataNodeManager.hashRing.GetNode(key)
+	var err error = nil
+	if dataNode == ""{
+		err = errors.New("find no data string")
+	}
+	return dataNode, err
 }

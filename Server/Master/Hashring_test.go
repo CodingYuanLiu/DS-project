@@ -1,7 +1,6 @@
 package main
 
 import (
-	//	"fmt"
 	"testing"
 )
 
@@ -39,8 +38,8 @@ func TestHash(t *testing.T) {
 	nodeWeight[node2] = 2
 	nodeWeight[node3] = 3
 	vitualSpots := 100
-
 	hash := NewHashRing(vitualSpots)
+	t.Logf("empty get: %s\n", hash.GetNode("1"))
 
 	hash.AddNodes(nodeWeight)
 	if hash.GetNode("1") != node3 {

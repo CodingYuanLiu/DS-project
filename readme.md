@@ -17,5 +17,7 @@
  
 ## Day3 
  * 实现读写锁满足多client运行 
- * 尝试着开始实现client运行过程中加入新节点的情况。需要重新注册和reshard
- * 先不考虑容错。
+    * zookeeper的锁是以节点为准，而不是以lock object（指针）为准的，i.e., 即使是两个不同的lock object，如果指向同一个节点也可以lock。
+    每次newLock生成的lock只能lock一次，否则将抛出死锁错误。所以我们不能使用共享的reader lock和writer lock
+    * 对于reader lock，它的lock 和 unlock在一个函数里面，因此直接新生成一把锁去lock和unlock readerlock节点就行。
+    * 对于writer lock，我们在锁它之后

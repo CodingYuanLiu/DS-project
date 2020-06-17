@@ -1,30 +1,40 @@
 package main
 
-import "testing"
+import (
+	"fmt"
+	"testing"
+)
 
-func TestClient(t *testing.T) {
+func testClient(t *testing.T, ch chan string, id int) {
 	cli := NewClient()
-	value, err := cli.Read("2")
-	t.Logf("First read: %v, error: %v\n", value, err)
+
 	if err := cli.Put("1", "value1"); err != nil{
-		t.Fatal(err)
+		t.Error(err)
 	}
 	if err := cli.Put("2", "value2"); err != nil{
-		t.Fatal(err)
+		t.Error(err)
 	}
+	if value, err := cli.Read("2"); err != nil || value != "value2"{
+		t.Error(err)
+	}
+
 	if err := cli.Put("2", "value2.2"); err != nil{
-		t.Fatal(err)
+		t.Error(err)
 	}
 
 	if value, err := cli.Read("2"); err != nil || value != "value2.2"{
-		t.Fatal(err)
+		t.Error(err)
 	}
 	if err := cli.Delete("2"); err != nil{
-		t.Fatal(err)
+		t.Error(err)
 	}
-	if value, err := cli.Read("2"); err == nil || value != ""{
-		t.Fatal("Read deleted value")
-	}
+	ch <- "test finish"
+}
 
-	t.Logf("Last read: %v, error: %v\n", value, err)
+func TestConcurrentClient(t *testing.T){
+	ch := make(chan string)
+	go testClient(t, ch, 0)
+	go testClient(t, ch, 1)
+	fmt.Println(<-ch)
+	fmt.Println(<-ch)
 }

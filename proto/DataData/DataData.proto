@@ -14,19 +14,17 @@
 
 syntax = "proto3";
 
-package ClientMaster;
-// The greeting service definition.
-service ClientMaster {
-  // Sends a greeting
+package DataData;
+
+//use to reshard the datas
+service DataData {
   rpc ClientMasterFindDataNode (ClientMasterFindDataNodeReq) returns (ClientMasterFindDataNodeResp) {}
 }
 
-// The request message containing the user's name.
 message ClientMasterFindDataNodeReq {
   string Key = 1;
 }
 
-// The response message containing the greetings
 message ClientMasterFindDataNodeResp {
   string Port = 1;
 }

@@ -44,16 +44,16 @@ const (
 const _ = proto.ProtoPackageIsVersion4
 
 // The request message containing the user's name.
-type ClientMasterPutReq struct {
+type ClientMasterFindDataNodeReq struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Key string `protobuf:"bytes,1,opt,name=key,proto3" json:"key,omitempty"`
+	Key string `protobuf:"bytes,1,opt,name=Key,proto3" json:"Key,omitempty"`
 }
 
-func (x *ClientMasterPutReq) Reset() {
-	*x = ClientMasterPutReq{}
+func (x *ClientMasterFindDataNodeReq) Reset() {
+	*x = ClientMasterFindDataNodeReq{}
 	if protoimpl.UnsafeEnabled {
 		mi := &file_proto_ClientMaster_ClientMaster_proto_msgTypes[0]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -61,13 +61,13 @@ func (x *ClientMasterPutReq) Reset() {
 	}
 }
 
-func (x *ClientMasterPutReq) String() string {
+func (x *ClientMasterFindDataNodeReq) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*ClientMasterPutReq) ProtoMessage() {}
+func (*ClientMasterFindDataNodeReq) ProtoMessage() {}
 
-func (x *ClientMasterPutReq) ProtoReflect() protoreflect.Message {
+func (x *ClientMasterFindDataNodeReq) ProtoReflect() protoreflect.Message {
 	mi := &file_proto_ClientMaster_ClientMaster_proto_msgTypes[0]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -79,28 +79,29 @@ func (x *ClientMasterPutReq) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use ClientMasterPutReq.ProtoReflect.Descriptor instead.
-func (*ClientMasterPutReq) Descriptor() ([]byte, []int) {
+// Deprecated: Use ClientMasterFindDataNodeReq.ProtoReflect.Descriptor instead.
+func (*ClientMasterFindDataNodeReq) Descriptor() ([]byte, []int) {
 	return file_proto_ClientMaster_ClientMaster_proto_rawDescGZIP(), []int{0}
 }
 
-func (x *ClientMasterPutReq) GetKey() string {
+func (x *ClientMasterFindDataNodeReq) GetKey() string {
 	if x != nil {
 		return x.Key
 	}
 	return ""
 }
 
-type ClientMasterDeleteReq struct {
+// The response message containing the greetings
+type ClientMasterFindDataNodeResp struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Key string `protobuf:"bytes,1,opt,name=key,proto3" json:"key,omitempty"`
+	Port string `protobuf:"bytes,1,opt,name=Port,proto3" json:"Port,omitempty"`
 }
 
-func (x *ClientMasterDeleteReq) Reset() {
-	*x = ClientMasterDeleteReq{}
+func (x *ClientMasterFindDataNodeResp) Reset() {
+	*x = ClientMasterFindDataNodeResp{}
 	if protoimpl.UnsafeEnabled {
 		mi := &file_proto_ClientMaster_ClientMaster_proto_msgTypes[1]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -108,13 +109,13 @@ func (x *ClientMasterDeleteReq) Reset() {
 	}
 }
 
-func (x *ClientMasterDeleteReq) String() string {
+func (x *ClientMasterFindDataNodeResp) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*ClientMasterDeleteReq) ProtoMessage() {}
+func (*ClientMasterFindDataNodeResp) ProtoMessage() {}
 
-func (x *ClientMasterDeleteReq) ProtoReflect() protoreflect.Message {
+func (x *ClientMasterFindDataNodeResp) ProtoReflect() protoreflect.Message {
 	mi := &file_proto_ClientMaster_ClientMaster_proto_msgTypes[1]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -126,201 +127,12 @@ func (x *ClientMasterDeleteReq) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use ClientMasterDeleteReq.ProtoReflect.Descriptor instead.
-func (*ClientMasterDeleteReq) Descriptor() ([]byte, []int) {
+// Deprecated: Use ClientMasterFindDataNodeResp.ProtoReflect.Descriptor instead.
+func (*ClientMasterFindDataNodeResp) Descriptor() ([]byte, []int) {
 	return file_proto_ClientMaster_ClientMaster_proto_rawDescGZIP(), []int{1}
 }
 
-func (x *ClientMasterDeleteReq) GetKey() string {
-	if x != nil {
-		return x.Key
-	}
-	return ""
-}
-
-type ClientMasterReadReq struct {
-	state         protoimpl.MessageState
-	sizeCache     protoimpl.SizeCache
-	unknownFields protoimpl.UnknownFields
-
-	Key string `protobuf:"bytes,1,opt,name=key,proto3" json:"key,omitempty"`
-}
-
-func (x *ClientMasterReadReq) Reset() {
-	*x = ClientMasterReadReq{}
-	if protoimpl.UnsafeEnabled {
-		mi := &file_proto_ClientMaster_ClientMaster_proto_msgTypes[2]
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		ms.StoreMessageInfo(mi)
-	}
-}
-
-func (x *ClientMasterReadReq) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*ClientMasterReadReq) ProtoMessage() {}
-
-func (x *ClientMasterReadReq) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_ClientMaster_ClientMaster_proto_msgTypes[2]
-	if protoimpl.UnsafeEnabled && x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use ClientMasterReadReq.ProtoReflect.Descriptor instead.
-func (*ClientMasterReadReq) Descriptor() ([]byte, []int) {
-	return file_proto_ClientMaster_ClientMaster_proto_rawDescGZIP(), []int{2}
-}
-
-func (x *ClientMasterReadReq) GetKey() string {
-	if x != nil {
-		return x.Key
-	}
-	return ""
-}
-
-// The response message containing the greetings
-type ClientMasterPutResp struct {
-	state         protoimpl.MessageState
-	sizeCache     protoimpl.SizeCache
-	unknownFields protoimpl.UnknownFields
-
-	Port string `protobuf:"bytes,1,opt,name=port,proto3" json:"port,omitempty"`
-}
-
-func (x *ClientMasterPutResp) Reset() {
-	*x = ClientMasterPutResp{}
-	if protoimpl.UnsafeEnabled {
-		mi := &file_proto_ClientMaster_ClientMaster_proto_msgTypes[3]
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		ms.StoreMessageInfo(mi)
-	}
-}
-
-func (x *ClientMasterPutResp) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*ClientMasterPutResp) ProtoMessage() {}
-
-func (x *ClientMasterPutResp) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_ClientMaster_ClientMaster_proto_msgTypes[3]
-	if protoimpl.UnsafeEnabled && x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use ClientMasterPutResp.ProtoReflect.Descriptor instead.
-func (*ClientMasterPutResp) Descriptor() ([]byte, []int) {
-	return file_proto_ClientMaster_ClientMaster_proto_rawDescGZIP(), []int{3}
-}
-
-func (x *ClientMasterPutResp) GetPort() string {
-	if x != nil {
-		return x.Port
-	}
-	return ""
-}
-
-type ClientMasterReadResp struct {
-	state         protoimpl.MessageState
-	sizeCache     protoimpl.SizeCache
-	unknownFields protoimpl.UnknownFields
-
-	Port string `protobuf:"bytes,1,opt,name=port,proto3" json:"port,omitempty"`
-}
-
-func (x *ClientMasterReadResp) Reset() {
-	*x = ClientMasterReadResp{}
-	if protoimpl.UnsafeEnabled {
-		mi := &file_proto_ClientMaster_ClientMaster_proto_msgTypes[4]
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		ms.StoreMessageInfo(mi)
-	}
-}
-
-func (x *ClientMasterReadResp) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*ClientMasterReadResp) ProtoMessage() {}
-
-func (x *ClientMasterReadResp) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_ClientMaster_ClientMaster_proto_msgTypes[4]
-	if protoimpl.UnsafeEnabled && x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use ClientMasterReadResp.ProtoReflect.Descriptor instead.
-func (*ClientMasterReadResp) Descriptor() ([]byte, []int) {
-	return file_proto_ClientMaster_ClientMaster_proto_rawDescGZIP(), []int{4}
-}
-
-func (x *ClientMasterReadResp) GetPort() string {
-	if x != nil {
-		return x.Port
-	}
-	return ""
-}
-
-type ClientMasterDeleteResp struct {
-	state         protoimpl.MessageState
-	sizeCache     protoimpl.SizeCache
-	unknownFields protoimpl.UnknownFields
-
-	Port string `protobuf:"bytes,1,opt,name=port,proto3" json:"port,omitempty"`
-}
-
-func (x *ClientMasterDeleteResp) Reset() {
-	*x = ClientMasterDeleteResp{}
-	if protoimpl.UnsafeEnabled {
-		mi := &file_proto_ClientMaster_ClientMaster_proto_msgTypes[5]
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		ms.StoreMessageInfo(mi)
-	}
-}
-
-func (x *ClientMasterDeleteResp) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*ClientMasterDeleteResp) ProtoMessage() {}
-
-func (x *ClientMasterDeleteResp) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_ClientMaster_ClientMaster_proto_msgTypes[5]
-	if protoimpl.UnsafeEnabled && x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use ClientMasterDeleteResp.ProtoReflect.Descriptor instead.
-func (*ClientMasterDeleteResp) Descriptor() ([]byte, []int) {
-	return file_proto_ClientMaster_ClientMaster_proto_rawDescGZIP(), []int{5}
-}
-
-func (x *ClientMasterDeleteResp) GetPort() string {
+func (x *ClientMasterFindDataNodeResp) GetPort() string {
 	if x != nil {
 		return x.Port
 	}
@@ -333,42 +145,22 @@ var file_proto_ClientMaster_ClientMaster_proto_rawDesc = []byte{
 	0x0a, 0x25, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2f, 0x43, 0x6c, 0x69, 0x65, 0x6e, 0x74, 0x4d, 0x61,
 	0x73, 0x74, 0x65, 0x72, 0x2f, 0x43, 0x6c, 0x69, 0x65, 0x6e, 0x74, 0x4d, 0x61, 0x73, 0x74, 0x65,
 	0x72, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x12, 0x0c, 0x43, 0x6c, 0x69, 0x65, 0x6e, 0x74, 0x4d,
-	0x61, 0x73, 0x74, 0x65, 0x72, 0x22, 0x26, 0x0a, 0x12, 0x43, 0x6c, 0x69, 0x65, 0x6e, 0x74, 0x4d,
-	0x61, 0x73, 0x74, 0x65, 0x72, 0x50, 0x75, 0x74, 0x52, 0x65, 0x71, 0x12, 0x10, 0x0a, 0x03, 0x6b,
-	0x65, 0x79, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x03, 0x6b, 0x65, 0x79, 0x22, 0x29, 0x0a,
-	0x15, 0x43, 0x6c, 0x69, 0x65, 0x6e, 0x74, 0x4d, 0x61, 0x73, 0x74, 0x65, 0x72, 0x44, 0x65, 0x6c,
-	0x65, 0x74, 0x65, 0x52, 0x65, 0x71, 0x12, 0x10, 0x0a, 0x03, 0x6b, 0x65, 0x79, 0x18, 0x01, 0x20,
-	0x01, 0x28, 0x09, 0x52, 0x03, 0x6b, 0x65, 0x79, 0x22, 0x27, 0x0a, 0x13, 0x43, 0x6c, 0x69, 0x65,
-	0x6e, 0x74, 0x4d, 0x61, 0x73, 0x74, 0x65, 0x72, 0x52, 0x65, 0x61, 0x64, 0x52, 0x65, 0x71, 0x12,
-	0x10, 0x0a, 0x03, 0x6b, 0x65, 0x79, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x03, 0x6b, 0x65,
-	0x79, 0x22, 0x29, 0x0a, 0x13, 0x43, 0x6c, 0x69, 0x65, 0x6e, 0x74, 0x4d, 0x61, 0x73, 0x74, 0x65,
-	0x72, 0x50, 0x75, 0x74, 0x52, 0x65, 0x73, 0x70, 0x12, 0x12, 0x0a, 0x04, 0x70, 0x6f, 0x72, 0x74,
-	0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x04, 0x70, 0x6f, 0x72, 0x74, 0x22, 0x2a, 0x0a, 0x14,
-	0x43, 0x6c, 0x69, 0x65, 0x6e, 0x74, 0x4d, 0x61, 0x73, 0x74, 0x65, 0x72, 0x52, 0x65, 0x61, 0x64,
-	0x52, 0x65, 0x73, 0x70, 0x12, 0x12, 0x0a, 0x04, 0x70, 0x6f, 0x72, 0x74, 0x18, 0x01, 0x20, 0x01,
-	0x28, 0x09, 0x52, 0x04, 0x70, 0x6f, 0x72, 0x74, 0x22, 0x2c, 0x0a, 0x16, 0x43, 0x6c, 0x69, 0x65,
-	0x6e, 0x74, 0x4d, 0x61, 0x73, 0x74, 0x65, 0x72, 0x44, 0x65, 0x6c, 0x65, 0x74, 0x65, 0x52, 0x65,
-	0x73, 0x70, 0x12, 0x12, 0x0a, 0x04, 0x70, 0x6f, 0x72, 0x74, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09,
-	0x52, 0x04, 0x70, 0x6f, 0x72, 0x74, 0x32, 0xa8, 0x02, 0x0a, 0x0c, 0x43, 0x6c, 0x69, 0x65, 0x6e,
-	0x74, 0x4d, 0x61, 0x73, 0x74, 0x65, 0x72, 0x12, 0x58, 0x0a, 0x0f, 0x43, 0x6c, 0x69, 0x65, 0x6e,
-	0x74, 0x4d, 0x61, 0x73, 0x74, 0x65, 0x72, 0x50, 0x75, 0x74, 0x12, 0x20, 0x2e, 0x43, 0x6c, 0x69,
-	0x65, 0x6e, 0x74, 0x4d, 0x61, 0x73, 0x74, 0x65, 0x72, 0x2e, 0x43, 0x6c, 0x69, 0x65, 0x6e, 0x74,
-	0x4d, 0x61, 0x73, 0x74, 0x65, 0x72, 0x50, 0x75, 0x74, 0x52, 0x65, 0x71, 0x1a, 0x21, 0x2e, 0x43,
-	0x6c, 0x69, 0x65, 0x6e, 0x74, 0x4d, 0x61, 0x73, 0x74, 0x65, 0x72, 0x2e, 0x43, 0x6c, 0x69, 0x65,
-	0x6e, 0x74, 0x4d, 0x61, 0x73, 0x74, 0x65, 0x72, 0x50, 0x75, 0x74, 0x52, 0x65, 0x73, 0x70, 0x22,
-	0x00, 0x12, 0x61, 0x0a, 0x12, 0x43, 0x6c, 0x69, 0x65, 0x6e, 0x74, 0x4d, 0x61, 0x73, 0x74, 0x65,
-	0x72, 0x44, 0x65, 0x6c, 0x65, 0x74, 0x65, 0x12, 0x23, 0x2e, 0x43, 0x6c, 0x69, 0x65, 0x6e, 0x74,
+	0x61, 0x73, 0x74, 0x65, 0x72, 0x22, 0x2f, 0x0a, 0x1b, 0x43, 0x6c, 0x69, 0x65, 0x6e, 0x74, 0x4d,
+	0x61, 0x73, 0x74, 0x65, 0x72, 0x46, 0x69, 0x6e, 0x64, 0x44, 0x61, 0x74, 0x61, 0x4e, 0x6f, 0x64,
+	0x65, 0x52, 0x65, 0x71, 0x12, 0x10, 0x0a, 0x03, 0x4b, 0x65, 0x79, 0x18, 0x01, 0x20, 0x01, 0x28,
+	0x09, 0x52, 0x03, 0x4b, 0x65, 0x79, 0x22, 0x32, 0x0a, 0x1c, 0x43, 0x6c, 0x69, 0x65, 0x6e, 0x74,
+	0x4d, 0x61, 0x73, 0x74, 0x65, 0x72, 0x46, 0x69, 0x6e, 0x64, 0x44, 0x61, 0x74, 0x61, 0x4e, 0x6f,
+	0x64, 0x65, 0x52, 0x65, 0x73, 0x70, 0x12, 0x12, 0x0a, 0x04, 0x50, 0x6f, 0x72, 0x74, 0x18, 0x01,
+	0x20, 0x01, 0x28, 0x09, 0x52, 0x04, 0x50, 0x6f, 0x72, 0x74, 0x32, 0x83, 0x01, 0x0a, 0x0c, 0x43,
+	0x6c, 0x69, 0x65, 0x6e, 0x74, 0x4d, 0x61, 0x73, 0x74, 0x65, 0x72, 0x12, 0x73, 0x0a, 0x18, 0x43,
+	0x6c, 0x69, 0x65, 0x6e, 0x74, 0x4d, 0x61, 0x73, 0x74, 0x65, 0x72, 0x46, 0x69, 0x6e, 0x64, 0x44,
+	0x61, 0x74, 0x61, 0x4e, 0x6f, 0x64, 0x65, 0x12, 0x29, 0x2e, 0x43, 0x6c, 0x69, 0x65, 0x6e, 0x74,
 	0x4d, 0x61, 0x73, 0x74, 0x65, 0x72, 0x2e, 0x43, 0x6c, 0x69, 0x65, 0x6e, 0x74, 0x4d, 0x61, 0x73,
-	0x74, 0x65, 0x72, 0x44, 0x65, 0x6c, 0x65, 0x74, 0x65, 0x52, 0x65, 0x71, 0x1a, 0x24, 0x2e, 0x43,
-	0x6c, 0x69, 0x65, 0x6e, 0x74, 0x4d, 0x61, 0x73, 0x74, 0x65, 0x72, 0x2e, 0x43, 0x6c, 0x69, 0x65,
-	0x6e, 0x74, 0x4d, 0x61, 0x73, 0x74, 0x65, 0x72, 0x44, 0x65, 0x6c, 0x65, 0x74, 0x65, 0x52, 0x65,
-	0x73, 0x70, 0x22, 0x00, 0x12, 0x5b, 0x0a, 0x10, 0x43, 0x6c, 0x69, 0x65, 0x6e, 0x74, 0x4d, 0x61,
-	0x73, 0x74, 0x65, 0x72, 0x52, 0x65, 0x61, 0x64, 0x12, 0x21, 0x2e, 0x43, 0x6c, 0x69, 0x65, 0x6e,
-	0x74, 0x4d, 0x61, 0x73, 0x74, 0x65, 0x72, 0x2e, 0x43, 0x6c, 0x69, 0x65, 0x6e, 0x74, 0x4d, 0x61,
-	0x73, 0x74, 0x65, 0x72, 0x52, 0x65, 0x61, 0x64, 0x52, 0x65, 0x71, 0x1a, 0x22, 0x2e, 0x43, 0x6c,
-	0x69, 0x65, 0x6e, 0x74, 0x4d, 0x61, 0x73, 0x74, 0x65, 0x72, 0x2e, 0x43, 0x6c, 0x69, 0x65, 0x6e,
-	0x74, 0x4d, 0x61, 0x73, 0x74, 0x65, 0x72, 0x52, 0x65, 0x61, 0x64, 0x52, 0x65, 0x73, 0x70, 0x22,
-	0x00, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
+	0x74, 0x65, 0x72, 0x46, 0x69, 0x6e, 0x64, 0x44, 0x61, 0x74, 0x61, 0x4e, 0x6f, 0x64, 0x65, 0x52,
+	0x65, 0x71, 0x1a, 0x2a, 0x2e, 0x43, 0x6c, 0x69, 0x65, 0x6e, 0x74, 0x4d, 0x61, 0x73, 0x74, 0x65,
+	0x72, 0x2e, 0x43, 0x6c, 0x69, 0x65, 0x6e, 0x74, 0x4d, 0x61, 0x73, 0x74, 0x65, 0x72, 0x46, 0x69,
+	0x6e, 0x64, 0x44, 0x61, 0x74, 0x61, 0x4e, 0x6f, 0x64, 0x65, 0x52, 0x65, 0x73, 0x70, 0x22, 0x00,
+	0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
 var (
@@ -383,24 +175,16 @@ func file_proto_ClientMaster_ClientMaster_proto_rawDescGZIP() []byte {
 	return file_proto_ClientMaster_ClientMaster_proto_rawDescData
 }
 
-var file_proto_ClientMaster_ClientMaster_proto_msgTypes = make([]protoimpl.MessageInfo, 6)
+var file_proto_ClientMaster_ClientMaster_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
 var file_proto_ClientMaster_ClientMaster_proto_goTypes = []interface{}{
-	(*ClientMasterPutReq)(nil),     // 0: ClientMaster.ClientMasterPutReq
-	(*ClientMasterDeleteReq)(nil),  // 1: ClientMaster.ClientMasterDeleteReq
-	(*ClientMasterReadReq)(nil),    // 2: ClientMaster.ClientMasterReadReq
-	(*ClientMasterPutResp)(nil),    // 3: ClientMaster.ClientMasterPutResp
-	(*ClientMasterReadResp)(nil),   // 4: ClientMaster.ClientMasterReadResp
-	(*ClientMasterDeleteResp)(nil), // 5: ClientMaster.ClientMasterDeleteResp
+	(*ClientMasterFindDataNodeReq)(nil),  // 0: ClientMaster.ClientMasterFindDataNodeReq
+	(*ClientMasterFindDataNodeResp)(nil), // 1: ClientMaster.ClientMasterFindDataNodeResp
 }
 var file_proto_ClientMaster_ClientMaster_proto_depIdxs = []int32{
-	0, // 0: ClientMaster.ClientMaster.ClientMasterPut:input_type -> ClientMaster.ClientMasterPutReq
-	1, // 1: ClientMaster.ClientMaster.ClientMasterDelete:input_type -> ClientMaster.ClientMasterDeleteReq
-	2, // 2: ClientMaster.ClientMaster.ClientMasterRead:input_type -> ClientMaster.ClientMasterReadReq
-	3, // 3: ClientMaster.ClientMaster.ClientMasterPut:output_type -> ClientMaster.ClientMasterPutResp
-	5, // 4: ClientMaster.ClientMaster.ClientMasterDelete:output_type -> ClientMaster.ClientMasterDeleteResp
-	4, // 5: ClientMaster.ClientMaster.ClientMasterRead:output_type -> ClientMaster.ClientMasterReadResp
-	3, // [3:6] is the sub-list for method output_type
-	0, // [0:3] is the sub-list for method input_type
+	0, // 0: ClientMaster.ClientMaster.ClientMasterFindDataNode:input_type -> ClientMaster.ClientMasterFindDataNodeReq
+	1, // 1: ClientMaster.ClientMaster.ClientMasterFindDataNode:output_type -> ClientMaster.ClientMasterFindDataNodeResp
+	1, // [1:2] is the sub-list for method output_type
+	0, // [0:1] is the sub-list for method input_type
 	0, // [0:0] is the sub-list for extension type_name
 	0, // [0:0] is the sub-list for extension extendee
 	0, // [0:0] is the sub-list for field type_name
@@ -413,7 +197,7 @@ func file_proto_ClientMaster_ClientMaster_proto_init() {
 	}
 	if !protoimpl.UnsafeEnabled {
 		file_proto_ClientMaster_ClientMaster_proto_msgTypes[0].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*ClientMasterPutReq); i {
+			switch v := v.(*ClientMasterFindDataNodeReq); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -425,55 +209,7 @@ func file_proto_ClientMaster_ClientMaster_proto_init() {
 			}
 		}
 		file_proto_ClientMaster_ClientMaster_proto_msgTypes[1].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*ClientMasterDeleteReq); i {
-			case 0:
-				return &v.state
-			case 1:
-				return &v.sizeCache
-			case 2:
-				return &v.unknownFields
-			default:
-				return nil
-			}
-		}
-		file_proto_ClientMaster_ClientMaster_proto_msgTypes[2].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*ClientMasterReadReq); i {
-			case 0:
-				return &v.state
-			case 1:
-				return &v.sizeCache
-			case 2:
-				return &v.unknownFields
-			default:
-				return nil
-			}
-		}
-		file_proto_ClientMaster_ClientMaster_proto_msgTypes[3].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*ClientMasterPutResp); i {
-			case 0:
-				return &v.state
-			case 1:
-				return &v.sizeCache
-			case 2:
-				return &v.unknownFields
-			default:
-				return nil
-			}
-		}
-		file_proto_ClientMaster_ClientMaster_proto_msgTypes[4].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*ClientMasterReadResp); i {
-			case 0:
-				return &v.state
-			case 1:
-				return &v.sizeCache
-			case 2:
-				return &v.unknownFields
-			default:
-				return nil
-			}
-		}
-		file_proto_ClientMaster_ClientMaster_proto_msgTypes[5].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*ClientMasterDeleteResp); i {
+			switch v := v.(*ClientMasterFindDataNodeResp); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -491,7 +227,7 @@ func file_proto_ClientMaster_ClientMaster_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_proto_ClientMaster_ClientMaster_proto_rawDesc,
 			NumEnums:      0,
-			NumMessages:   6,
+			NumMessages:   2,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
@@ -518,9 +254,7 @@ const _ = grpc.SupportPackageIsVersion6
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type ClientMasterClient interface {
 	// Sends a greeting
-	ClientMasterPut(ctx context.Context, in *ClientMasterPutReq, opts ...grpc.CallOption) (*ClientMasterPutResp, error)
-	ClientMasterDelete(ctx context.Context, in *ClientMasterDeleteReq, opts ...grpc.CallOption) (*ClientMasterDeleteResp, error)
-	ClientMasterRead(ctx context.Context, in *ClientMasterReadReq, opts ...grpc.CallOption) (*ClientMasterReadResp, error)
+	ClientMasterFindDataNode(ctx context.Context, in *ClientMasterFindDataNodeReq, opts ...grpc.CallOption) (*ClientMasterFindDataNodeResp, error)
 }
 
 type clientMasterClient struct {
@@ -531,27 +265,9 @@ func NewClientMasterClient(cc grpc.ClientConnInterface) ClientMasterClient {
 	return &clientMasterClient{cc}
 }
 
-func (c *clientMasterClient) ClientMasterPut(ctx context.Context, in *ClientMasterPutReq, opts ...grpc.CallOption) (*ClientMasterPutResp, error) {
-	out := new(ClientMasterPutResp)
-	err := c.cc.Invoke(ctx, "/ClientMaster.ClientMaster/ClientMasterPut", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *clientMasterClient) ClientMasterDelete(ctx context.Context, in *ClientMasterDeleteReq, opts ...grpc.CallOption) (*ClientMasterDeleteResp, error) {
-	out := new(ClientMasterDeleteResp)
-	err := c.cc.Invoke(ctx, "/ClientMaster.ClientMaster/ClientMasterDelete", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *clientMasterClient) ClientMasterRead(ctx context.Context, in *ClientMasterReadReq, opts ...grpc.CallOption) (*ClientMasterReadResp, error) {
-	out := new(ClientMasterReadResp)
-	err := c.cc.Invoke(ctx, "/ClientMaster.ClientMaster/ClientMasterRead", in, out, opts...)
+func (c *clientMasterClient) ClientMasterFindDataNode(ctx context.Context, in *ClientMasterFindDataNodeReq, opts ...grpc.CallOption) (*ClientMasterFindDataNodeResp, error) {
+	out := new(ClientMasterFindDataNodeResp)
+	err := c.cc.Invoke(ctx, "/ClientMaster.ClientMaster/ClientMasterFindDataNode", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -561,79 +277,35 @@ func (c *clientMasterClient) ClientMasterRead(ctx context.Context, in *ClientMas
 // ClientMasterServer is the server API for ClientMaster service.
 type ClientMasterServer interface {
 	// Sends a greeting
-	ClientMasterPut(context.Context, *ClientMasterPutReq) (*ClientMasterPutResp, error)
-	ClientMasterDelete(context.Context, *ClientMasterDeleteReq) (*ClientMasterDeleteResp, error)
-	ClientMasterRead(context.Context, *ClientMasterReadReq) (*ClientMasterReadResp, error)
+	ClientMasterFindDataNode(context.Context, *ClientMasterFindDataNodeReq) (*ClientMasterFindDataNodeResp, error)
 }
 
 // UnimplementedClientMasterServer can be embedded to have forward compatible implementations.
 type UnimplementedClientMasterServer struct {
 }
 
-func (*UnimplementedClientMasterServer) ClientMasterPut(context.Context, *ClientMasterPutReq) (*ClientMasterPutResp, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method ClientMasterPut not implemented")
-}
-func (*UnimplementedClientMasterServer) ClientMasterDelete(context.Context, *ClientMasterDeleteReq) (*ClientMasterDeleteResp, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method ClientMasterDelete not implemented")
-}
-func (*UnimplementedClientMasterServer) ClientMasterRead(context.Context, *ClientMasterReadReq) (*ClientMasterReadResp, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method ClientMasterRead not implemented")
+func (*UnimplementedClientMasterServer) ClientMasterFindDataNode(context.Context, *ClientMasterFindDataNodeReq) (*ClientMasterFindDataNodeResp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ClientMasterFindDataNode not implemented")
 }
 
 func RegisterClientMasterServer(s *grpc.Server, srv ClientMasterServer) {
 	s.RegisterService(&_ClientMaster_serviceDesc, srv)
 }
 
-func _ClientMaster_ClientMasterPut_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(ClientMasterPutReq)
+func _ClientMaster_ClientMasterFindDataNode_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ClientMasterFindDataNodeReq)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(ClientMasterServer).ClientMasterPut(ctx, in)
+		return srv.(ClientMasterServer).ClientMasterFindDataNode(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/ClientMaster.ClientMaster/ClientMasterPut",
+		FullMethod: "/ClientMaster.ClientMaster/ClientMasterFindDataNode",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ClientMasterServer).ClientMasterPut(ctx, req.(*ClientMasterPutReq))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _ClientMaster_ClientMasterDelete_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(ClientMasterDeleteReq)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(ClientMasterServer).ClientMasterDelete(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/ClientMaster.ClientMaster/ClientMasterDelete",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ClientMasterServer).ClientMasterDelete(ctx, req.(*ClientMasterDeleteReq))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _ClientMaster_ClientMasterRead_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(ClientMasterReadReq)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(ClientMasterServer).ClientMasterRead(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/ClientMaster.ClientMaster/ClientMasterRead",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ClientMasterServer).ClientMasterRead(ctx, req.(*ClientMasterReadReq))
+		return srv.(ClientMasterServer).ClientMasterFindDataNode(ctx, req.(*ClientMasterFindDataNodeReq))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -643,16 +315,8 @@ var _ClientMaster_serviceDesc = grpc.ServiceDesc{
 	HandlerType: (*ClientMasterServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "ClientMasterPut",
-			Handler:    _ClientMaster_ClientMasterPut_Handler,
-		},
-		{
-			MethodName: "ClientMasterDelete",
-			Handler:    _ClientMaster_ClientMasterDelete_Handler,
-		},
-		{
-			MethodName: "ClientMasterRead",
-			Handler:    _ClientMaster_ClientMasterRead_Handler,
+			MethodName: "ClientMasterFindDataNode",
+			Handler:    _ClientMaster_ClientMasterFindDataNode_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
