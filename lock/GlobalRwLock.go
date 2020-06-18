@@ -1,5 +1,6 @@
 package lock
 
+/*
 import (
 	"errors"
 	"fmt"
@@ -9,19 +10,16 @@ import (
 )
 
 const (
-	lockPath          = "/locks"
-	readerLockPath    = "/readerLock"
-	writerLockPath    = "/writerLock"
-	ReaderNumRootPath = "/readers"
+
 )
-type RwLock struct{
+type GlobalRwLock struct{
 	readerLock *zk.Lock
 	writerLock *zk.Lock
-	port string
 	conn *zk.Conn
 }
 
-func NewRwLock(port string) RwLock {
+
+func NewGlobalRwLock() RwLock {
 	readerLockPath := fmt.Sprintf("%s%s", lockPath, readerLockPath)
 	writerLockPath := fmt.Sprintf("%s%s", lockPath, writerLockPath)
 	hosts := []string{"localhost:2181", "localhost:2182", "localhost:2183"}
@@ -34,12 +32,11 @@ func NewRwLock(port string) RwLock {
 	return RwLock{
 		readerLock: zk.NewLock(conn, readerLockPath, zk.WorldACL(zk.PermAll)),
 		writerLock: zk.NewLock(conn, writerLockPath, zk.WorldACL(zk.PermAll)),
-		port: port,
 		conn: conn,
 	}
 }
 
-func GetReaderNum(conn *zk.Conn, port string) (int, error){
+func GetGlobalReaderNum(conn *zk.Conn, port string) (int, error){
 	path := fmt.Sprintf("%s/%s", ReaderNumRootPath, port)
 	v, _, err := conn.Get(path)
 	if err != nil{
@@ -48,7 +45,7 @@ func GetReaderNum(conn *zk.Conn, port string) (int, error){
 	return strconv.Atoi(string(v[:]))//Byte[] to string to int
 }
 
-func SetReaderNum(conn *zk.Conn, port string, reader int) error{
+func SetGlobalReaderNum(conn *zk.Conn, port string, reader int) error{
 	path := fmt.Sprintf("%s/%s", ReaderNumRootPath, port)
 	exist, s, err := conn.Exists(path)
 	if !exist{
@@ -60,7 +57,7 @@ func SetReaderNum(conn *zk.Conn, port string, reader int) error{
 	return err
 }
 
-func (l *RwLock) LockReader() error{
+func (l *GlobalRwLock) GlobalLockReader() error{
 	if err := l.readerLock.Lock(); err != nil{
 		return err
 	}
@@ -83,7 +80,7 @@ func (l *RwLock) LockReader() error{
 	return nil
 }
 
-func (l *RwLock) UnlockReader() error{
+func (l *GlobalRwLock) GlobalUnlockReader() error{
 	if err := l.readerLock.Lock(); err != nil{
 		return err
 	}
@@ -109,16 +106,17 @@ func (l *RwLock) UnlockReader() error{
 	return nil
 }
 
-func (l *RwLock) LockWriter() error{
+func (l *GlobalRwLock) GlobalLockWriter() error{
 	if err := l.writerLock.Lock(); err != nil{
 		return err
 	}
 	return nil
 }
 
-func (l *RwLock) UnlockWriter() error{
+func (l *RwLock) GlobalUnlockWriter() error{
 	if err := l.writerLock.Unlock(); err != nil{
 		return err
 	}
 	return nil
 }
+ */

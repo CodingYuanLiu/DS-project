@@ -38,8 +38,6 @@ func TestConcurrentClient(t *testing.T){
 	ch := make(chan string)
 	go testClient(t, ch, 0)
 	go testClient(t, ch, 1)
-	go testClient(t, ch, 2)
-	go testClient(t, ch, 3)
 	fmt.Println(<-ch)
 	fmt.Println(<-ch)
 }

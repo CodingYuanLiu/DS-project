@@ -22,7 +22,7 @@ type DataNodeManager struct{
 	//nodeMeta map[uuid.UUID] *DataNode //TODO: UUID may be useless
 	//nodeMeta map[string] masterDataPb.MasterDataClient //TODO: may be more useful than uuid
 	dataNodesSet map[string] int //The set of data nodes. The int value is use to do heart beat detection.
-	nodeNum int
+	nodeNum      int
 }
 
 /*
@@ -37,7 +37,9 @@ func NewDataNodeManager(conn *zk.Conn) (*DataNodeManager, error){
 	//nodeMeta := map[uuid.UUID]*DataNode{}
 	nodeNum := 0
 	_, err := conn.Create(lock.ReaderNumRootPath, []byte{}, 0, zk.WorldACL(zk.PermAll))
-	if err != nil{
+	if err == zk.ErrNodeExists{
+		log.Printf("Create readers root node: node already exists")
+	} else if err != nil{
 		return nil, err
 	}
 	return &DataNodeManager{
@@ -64,14 +66,18 @@ func NewDataNode(port string) *DataNode{
 */
 
 func (dataNodeManager DataNodeManager)DeleteDataNode(port string) error{
+	//TODO: lock the master node and data node when deletion is undone
 	delete(dataNodeManager.dataNodesSet, port)
 	dataNodeManager.hashRing.RemoveNode(port)
 	dataNodeManager.nodeNum -= 1
+	//TODO: do the migration (backup deployment)
+	//TODO: unlock
+
 	return nil
 }
 
 func (dataNodeManager DataNodeManager)RegisterDataNode(port string) error{
-	//TODO: lock the master.exe node and corresponding data node when register is undone
+	//TODO: lock the master node and corresponding data node when register is undone
 
 	/*
 	//Register the Node at NodeMeta
@@ -88,6 +94,7 @@ func (dataNodeManager DataNodeManager)RegisterDataNode(port string) error{
 	go dataNodeManager.HeartBeatDetection(port)
 
 	//TODO: do the data migration
+	//TODO: unlock
 	return nil
 }
 
@@ -115,11 +122,11 @@ func (dataNodeManager DataNodeManager)HeartBeatDetection(port string) error{
 				log.Printf("data node on port %v failed %d times, node value: %v\n", port, dataNodeManager.dataNodesSet[port], string(value[:]))
 			} else{
 				log.Printf("data node on port %v utterly failed, delete it\n", port)
+				_ = dataNodeManager.DeleteDataNode(port)
+				//Delete the zk node
 				if err := dataNodeManager.conn.Delete(nodePath, s.Version); err != nil{
 					return err
 				}
-				delete(dataNodeManager.dataNodesSet, port)
-				dataNodeManager.hashRing.RemoveNode(port)
 				break
 			}
 		} else{
