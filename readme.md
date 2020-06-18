@@ -23,6 +23,15 @@
     * 不知道这个测试应该怎么写比较好。瞎jb写了一个测试，似乎是可以跑了。
     
 ## Day4
+ * 实现自己的锁。
+   * Challenge: 我们需要根据节点创建的顺序来判断谁应该拿到锁。但是直接使用ChildrenW或者Children读出来的node顺序是乱的。比如我先插了node1和node2，有可能Children读出来的顺序就是node2先于node1.
  * 尝试实现data 节点的扩容。扩容要考虑
    1. 怎么加锁：使用一把全局的读写锁。每个client在向master请求RPC之前，无论是READ还是PUT，DELETE，都申请一把全局的读锁。而Master在注册的时候，申请一把全局的写锁。这样，只有没有client请求的时候，master会注册新的节点。
    2. 怎么reshard：
+   
+   
+## Notes
+* 注意一些不会自己清除的状态:
+    1. 先shutdown master的话，DataNode不会删除
+    2. readers/$port里面存着readers的数量。错误的情况下可能运行完之后不为0
+    3. locks/$port里面存着用来加锁的节点。不过这个正常情况下会自行消除。

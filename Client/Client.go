@@ -59,6 +59,7 @@ func (cli *Client) Put(key string, value string) error {
 
 	rwLock := cli.GetRwLock(port)
 	if err := rwLock.LockWriter(); err!= nil{
+		log.Printf("[error] lock writer error: %v\n", err)
 		return err
 	}
 
@@ -68,6 +69,7 @@ func (cli *Client) Put(key string, value string) error {
 	})
 	if err != nil{
 		if err := rwLock.UnlockWriter(); err!= nil{
+			log.Printf("[error] unlock writer error: %v\n", err)
 			return err
 		}
 		log.Fatalf("Put key-value to data node error: %v\n", err)
@@ -75,6 +77,7 @@ func (cli *Client) Put(key string, value string) error {
 	}
 
 	if err := rwLock.UnlockWriter(); err!= nil{
+		log.Printf("[error] unlock writer error: %v\n", err)
 		return err
 	}
 	log.Printf("Put %v:%v to data node (port \"%v\") succeed\nmessage: %v\n",

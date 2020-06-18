@@ -25,19 +25,20 @@ func testClient(t *testing.T, ch chan string, id int) {
 		t.Error(err)
 	}
 
-	if value, err := cli.Read("2"); err != nil || value != "value2.2"{
+	if value, err := cli.Read("2"); err != nil || value != "value2.2" {
 		t.Error(err)
 	}
-	if err := cli.Delete("1"); err != nil{
-		t.Log(err)
-	}
+
 	ch <- "test finish"
 }
 
 func TestConcurrentClient(t *testing.T){
+	threadNum := 4
 	ch := make(chan string)
-	go testClient(t, ch, 0)
-	go testClient(t, ch, 1)
-	fmt.Println(<-ch)
-	fmt.Println(<-ch)
+	for i := 0; i < threadNum; i++{
+		go testClient(t, ch, i)
+	}
+	for i := 0; i < threadNum; i++{
+		fmt.Println(<-ch)
+	}
 }
