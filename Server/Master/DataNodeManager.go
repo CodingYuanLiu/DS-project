@@ -169,8 +169,6 @@ func (dataNodeManager DataNodeManager) HandleDataNodesChanges(ports []string) er
 				}
 			}
 		}
-	} else{
-		return errors.New("no register and no delete, why")
 	}
 	return nil
 }

@@ -18,27 +18,27 @@ package MasterData;
 // The greeting service definition.
 service MasterData {
   // Sends a greeting
-  rpc MasterDataPut (MasterDataPutReq) returns (MasterDataPutResp) {}
-  rpc MasterDataDelete (MasterDataDeleteReq) returns (MasterDataDeleteResp) {}
-  rpc MasterDataRead (MasterDataReadReq) returns (MasterDataReadResp) {}
+  rpc MasterDataInformReshard (MasterDataInformReshardReq) returns (MasterDataInformReshardResp) {}
+  rpc MasterDataReshardDestination (MasterDataReshardDestinationReq) returns (MasterDataReshardDestinationResp) {}
+  rpc DataMasterReshardComplete (DataMasterReshardCompleteReq) returns (DataMasterReshardCompleteResp){}
 }
 
 // The request message containing the user's name.
-message MasterDataPutReq {
+message MasterDataInformReshardReq {
   string name = 1;
 }
 
 // The response message containing the greetings
-message MasterDataPutResp {
+message MasterDataInformReshardResp {
   string message = 1;
 }
 
-message MasterDataDeleteReq {
+message MasterDataReshardDestinationReq {
   string name = 1;
 }
 
 // The response message containing the greetings
-message MasterDataDeleteResp {
+message MasterDataReshardDestinationResp {
   string message = 1;
 }
 
@@ -52,3 +52,10 @@ message MasterDataReadResp {
   string message = 1;
 }
 
+message DataMasterReshardCompleteReq{
+  string name = 1;
+}
+
+message DataMasterReshardCompleteResp{
+  string message = 1;
+}

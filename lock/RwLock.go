@@ -10,12 +10,7 @@ import (
 	"time"
 )
 
-const (
-	lockPath          = "/locks"
-	readerLockPath    = "/readerLock"
-	writerLockPath    = "/writerLock"
-	ReaderNumRootPath = "/readers"
-)
+
 type RwLock struct{
 	readerLock *Lock
 	writerLock *Lock

@@ -2,6 +2,7 @@ package main
 
 import (
 	clientMasterPb "FinalProject/proto/ClientMaster"
+	masterDataPb "FinalProject/proto/MasterData"
 	"context"
 	"fmt"
 	"github.com/samuel/go-zookeeper/zk"
@@ -20,6 +21,7 @@ const(
 
 type Master struct{
 	clientMasterPb.UnimplementedClientMasterServer
+
 	//Store the metadata of the nodes
 	dataNodeManager *DataNodeManager //key:value => ID:port
 }
@@ -58,6 +60,7 @@ func (master *Master) WatchNewNode(conn *zk.Conn, path string) error{
 	}
 	return nil
 }
+
 
 func main(){
 	fmt.Println("Start to run master node...")
