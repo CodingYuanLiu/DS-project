@@ -33,7 +33,7 @@ func testClient(t *testing.T, ch chan string, id int) {
 }
 
 func TestConcurrentClient(t *testing.T){
-	threadNum := 4
+	threadNum := 2
 	ch := make(chan string)
 	for i := 0; i < threadNum; i++{
 		go testClient(t, ch, i)

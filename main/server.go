@@ -62,6 +62,25 @@ func test2RpcServers(){
 	}
 }
 
+func testByteStringConvert(){
+	str := []string{"hello","world","key2","key3"}
+	fmt.Printf("Original str:\n%v\n\n", str)
+	bytes := utils.StringArrayToByte(str)
+	fmt.Printf("Converted bytes:\n%v\n\n", bytes)
+	fmt.Printf("Converted str:\n%v\n\n", utils.ByteToStringArray(bytes))
+}
+
+
+func testMapByteConvert(){
+	database := map[string]string{
+		"key1": ":7777",
+		"key2": ":2200",
+	}
+	fmt.Printf("Original map:\n%v\n\n", database)
+	bytes := utils.KeyValueMapToByte(database)
+	fmt.Printf("Converted bytes:\n%v\n\n", bytes)
+	fmt.Printf("Converted map:\n%v\n\n", utils.ByteToKeyValueMap(bytes))
+}
 func main(){
-	test2RpcServers()
+	testMapByteConvert()
 }

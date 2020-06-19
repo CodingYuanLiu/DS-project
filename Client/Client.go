@@ -13,6 +13,7 @@ import (
 
 const(
 	masterAddress = "localhost:7000"
+	defaultIP = "localhost"
 )
 
 //Client interface
@@ -159,7 +160,6 @@ func (cli *Client) GetDataCli(port string) clientDataPb.ClientDataClient{
 		return client
 	}
 	log.Printf("New connection to data node at port %v\n", port)
-	defaultIP := "localhost"
 	dataNodeAddr := fmt.Sprintf("%v%v", defaultIP, port)
 	conn, err := grpc.Dial(dataNodeAddr, grpc.WithInsecure(), grpc.WithBlock())
 	if err != nil {

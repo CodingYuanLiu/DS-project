@@ -3,7 +3,7 @@ package main
 import (
 	"FinalProject/lock"
 	clientDataPb "FinalProject/proto/ClientData"
-	"context"
+	masterDataPb "FinalProject/proto/MasterData"
 	"errors"
 	"fmt"
 	"github.com/samuel/go-zookeeper/zk"
@@ -18,50 +18,9 @@ const(
 	dataNodesPath = "/DataNode" //The root node of the data nodes' ports
 	aliveResp = "Alive"
 	aliveReq = "Is alive?"
+	masterPort = ":7000"
+	defaultIP = "localhost"
 )
-
-type ClientDataServer struct{
-	clientDataPb.UnimplementedClientDataServer
-	database map[string] string
-}
-
-func (clientDataServer *ClientDataServer) ClientDataPut(ctx context.Context, req *clientDataPb.ClientDataPutReq) (*clientDataPb.ClientDataPutResp, error){
-
-	clientDataServer.database[req.Key] = req.Value
-
-	log.Printf("put key: %v, value: %v\n", req.Key, req.Value)
-	log.Println(clientDataServer.database)
-	return &clientDataPb.ClientDataPutResp{
-		Message: "[Data server]: put succeed",
-	}, nil
-}
-
-func (clientDataServer *ClientDataServer) ClientDataRead(ctx context.Context, req *clientDataPb.ClientDataReadReq) (*clientDataPb.ClientDataReadResp, error){
-	value, exist := clientDataServer.database[req.Key]
-	if !exist{
-		return nil, errors.New("no value in the database")
-	}
-	log.Printf("read key: %v, value: %v\n", req.Key, value)
-	log.Println(clientDataServer.database)
-	return &clientDataPb.ClientDataReadResp{
-		Value: value,
-		Message: "[Data server]: read succeed",
-	}, nil
-}
-
-func (clientDataServer *ClientDataServer) ClientDataDelete(ctx context.Context, req *clientDataPb.ClientDataDeleteReq) (*clientDataPb.ClientDataDeleteResp, error){
-	_, exist := clientDataServer.database[req.Key]
-	if !exist{
-
-		return nil, errors.New("no value in the database")
-	}
-	delete(clientDataServer.database, req.Key)
-
-	return &clientDataPb.ClientDataDeleteResp{
-		Message: "[Data server]: delete succeed",
-	}, nil
-
-}
 
 func ConnectZookeeper() *zk.Conn{
 	hosts := []string{"localhost:2181", "localhost:2182", "localhost:2183"}
@@ -149,7 +108,7 @@ func main() {
 	if err != nil{
 		log.Fatal(err)
 	}
-	dataServer := grpc.NewServer()
+	newServer := grpc.NewServer()
 	zkConn := ConnectZookeeper()
 
 	err = ZkRegisterDataNodePort(zkConn, port)
@@ -158,10 +117,27 @@ func main() {
 	}
 
 	go HeartBeatResponse(zkConn, port)
-	clientDataPb.RegisterClientDataServer(dataServer, &ClientDataServer{
+	dataServer := &DataServer{
 		database: map[string]string{},
+		dataMasterCli: NewDataMasterCli(),
+		port: port,
+	}
+
+	//TEST
+	/*
+	ctx, cancel := context.WithTimeout(context.Background(), 5 * time.Second)
+	defer cancel()
+	resp, _ := dataServer.dataMasterCli.DataMasterReshardComplete(ctx, &dataMasterPb.DataMasterReshardCompleteReq{
+		Message: "reshard complete",
 	})
-	if err = dataServer.Serve(lis); err != nil{
+	utils.Debug("Response from master via rpc: %v\n", resp.Message)
+	 */
+	//END TEST
+
+	clientDataPb.RegisterClientDataServer(newServer, dataServer)
+	masterDataPb.RegisterMasterDataServer(newServer, dataServer)
+
+	if err = newServer.Serve(lis); err != nil{
 		log.Fatal(err)
 	}
 }

@@ -20,42 +20,23 @@ service MasterData {
   // Sends a greeting
   rpc MasterDataInformReshard (MasterDataInformReshardReq) returns (MasterDataInformReshardResp) {}
   rpc MasterDataReshardDestination (MasterDataReshardDestinationReq) returns (MasterDataReshardDestinationResp) {}
-  rpc DataMasterReshardComplete (DataMasterReshardCompleteReq) returns (DataMasterReshardCompleteResp){}
 }
 
 // The request message containing the user's name.
 message MasterDataInformReshardReq {
-  string name = 1;
+  string Message = 1;
 }
 
 // The response message containing the greetings
 message MasterDataInformReshardResp {
-  string message = 1;
+  bytes Keys = 1;
 }
 
 message MasterDataReshardDestinationReq {
-  string name = 1;
+  bytes KeyDestination = 1;
 }
 
 // The response message containing the greetings
 message MasterDataReshardDestinationResp {
-  string message = 1;
-}
-
-
-message MasterDataReadReq {
-  string name = 1;
-}
-
-// The response message containing the greetings
-message MasterDataReadResp {
-  string message = 1;
-}
-
-message DataMasterReshardCompleteReq{
-  string name = 1;
-}
-
-message DataMasterReshardCompleteResp{
-  string message = 1;
+  string Message = 1;
 }

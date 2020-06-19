@@ -1,0 +1,15 @@
+
+syntax = "proto3";
+
+package DataMaster;
+service DataMaster {
+  rpc DataMasterReshardComplete (DataMasterReshardCompleteReq) returns (DataMasterReshardCompleteResp){}
+}
+
+message DataMasterReshardCompleteReq{
+  string Message = 1;
+}
+
+message DataMasterReshardCompleteResp{
+  string Message = 1;
+}

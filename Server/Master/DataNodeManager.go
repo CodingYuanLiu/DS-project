@@ -2,9 +2,13 @@ package main
 
 import (
 	"FinalProject/lock"
+	masterDataPb "FinalProject/proto/MasterData"
+	"FinalProject/utils"
+	"context"
 	"errors"
 	"fmt"
 	"github.com/samuel/go-zookeeper/zk"
+	"google.golang.org/grpc"
 	"log"
 	"time"
 )
@@ -19,18 +23,27 @@ const (
 type DataNodeManager struct{
 	conn *zk.Conn
 	hashRing *HashRing
-	//nodeMeta map[uuid.UUID] *DataNode //TODO: UUID may be useless
-	//nodeMeta map[string] masterDataPb.MasterDataClient //TODO: may be more useful than uuid
-	dataNodesSet map[string] int //The set of data nodes. The int value is use to do heart beat detection.
+	dataNodesSet map[string] *DataNode //The set of data nodes. The int value is use to do heart beat detection.
 	nodeNum      int
 }
 
-/*
+
 type DataNode struct{
-	port   string
+	heartBeatFailures   int
 	client masterDataPb.MasterDataClient
 }
-*/
+
+func NewDataNode(port string) *DataNode{
+	conn, err := grpc.Dial(port, grpc.WithInsecure(), grpc.WithBlock())
+	if err != nil {
+		log.Fatalf("did not connect: %v", err)
+	}
+	cli := masterDataPb.NewMasterDataClient(conn)
+	return &DataNode{
+		heartBeatFailures: 0,
+		client: cli,
+	}
+}
 
 func NewDataNodeManager(conn *zk.Conn) (*DataNodeManager, error){
 	hashRing := NewHashRing(100)
@@ -46,24 +59,10 @@ func NewDataNodeManager(conn *zk.Conn) (*DataNodeManager, error){
 		hashRing: hashRing,
 		//nodeMeta: nodeMeta,
 		nodeNum: nodeNum,
-		dataNodesSet: map[string]int{},
+		dataNodesSet: map[string] *DataNode{},
 		conn: conn,
 	}, nil
 }
-
-/*
-func NewDataNode(port string) *DataNode{
-	conn, err := grpc.Dial(port, grpc.WithInsecure(), grpc.WithBlock())
-	if err != nil {
-		log.Fatalf("did not connect: %v", err)
-	}
-	cli := masterDataPb.NewMasterDataClient(conn)
-	return &DataNode{
-		port: port,
-		client: cli,
-	}
-}
-*/
 
 func (dataNodeManager DataNodeManager)DeleteDataNode(port string) error{
 	//TODO: lock the master node and data node when deletion is undone
@@ -84,18 +83,54 @@ func (dataNodeManager DataNodeManager)RegisterDataNode(port string) error{
 	UUID := uuid.New()
 	dataNodeManager.nodeMeta[UUID] = NewDataNode(port)
 	*/
-	dataNodeManager.dataNodesSet[port] = 0
 
 	//Register the Node at hashRing
 	dataNodeManager.hashRing.AddNode(port, 1)
+	//TODO: do the data migration
+	err := dataNodeManager.DataReshard()
+
+	if err != nil{
+		utils.Error("DataReshard in RegisterDataNode error: %v\n", err)
+	}
 
 	dataNodeManager.nodeNum += 1
-
+	dataNodeManager.dataNodesSet[port] = NewDataNode(port)
 	go dataNodeManager.HeartBeatDetection(port)
 
-	//TODO: do the data migration
 	//TODO: unlock
 	return nil
+}
+
+func (dataNodeManager DataNodeManager)DataReshard() error{
+	for _, dataNode := range dataNodeManager.dataNodesSet{
+		ctx, cancel := context.WithTimeout(context.Background(), 5 * time.Second)
+		informResp, err := dataNode.client.MasterDataInformReshard(ctx, &masterDataPb.MasterDataInformReshardReq{
+		})
+		if err != nil{
+			utils.Error("inform client reshard error: %v\n", err)
+			return err
+		}
+		newKeysDestinations := dataNodeManager.RehashKeys(utils.ByteToStringArray(informResp.Keys))
+		ctx, cancel = context.WithTimeout(context.Background(), 5 * time.Second)
+		reshardResp, err := dataNode.client.MasterDataReshardDestination(ctx, &masterDataPb.MasterDataReshardDestinationReq{
+			KeyDestination: utils.KeyValueMapToByte(newKeysDestinations),
+		})
+		if err != nil{
+			utils.Error("reshard error: %v\n", err)
+			return err
+		}
+		utils.Debug("Data server reshard response: %s\n", reshardResp.Message)
+		cancel()
+	}
+	return nil
+}
+
+func (dataNodeManager DataNodeManager) RehashKeys(keys []string) map[string] string{
+	RehashResult := map[string] string{}
+	for _, key := range keys{
+		RehashResult[key] = dataNodeManager.hashRing.GetNode(key)
+	}
+	return RehashResult
 }
 
 func (dataNodeManager DataNodeManager)HeartBeatDetection(port string) error{
@@ -117,9 +152,9 @@ func (dataNodeManager DataNodeManager)HeartBeatDetection(port string) error{
 
 		//Heart beat detection failed
 		if string(value[:]) != aliveResp{
-			if dataNodeManager.dataNodesSet[port] < heartBeatDetectionFailureBound - 1{
-				dataNodeManager.dataNodesSet[port] += 1
-				log.Printf("data node on port %v failed %d times, node value: %v\n", port, dataNodeManager.dataNodesSet[port], string(value[:]))
+			if dataNodeManager.dataNodesSet[port].heartBeatFailures < heartBeatDetectionFailureBound - 1{
+				dataNodeManager.dataNodesSet[port].heartBeatFailures += 1
+				log.Printf("data node on port %v failed %d times, node value: %v\n", port, dataNodeManager.dataNodesSet[port].heartBeatFailures, string(value[:]))
 			} else{
 				log.Printf("data node on port %v utterly failed, delete it\n", port)
 				_ = dataNodeManager.DeleteDataNode(port)

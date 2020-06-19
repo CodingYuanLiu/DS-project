@@ -2,7 +2,10 @@ package main
 
 import (
 	clientMasterPb "FinalProject/proto/ClientMaster"
-	masterDataPb "FinalProject/proto/MasterData"
+	dataMasterPb "FinalProject/proto/DataMaster"
+	"FinalProject/utils"
+
+	//masterDataPb "FinalProject/proto/MasterData"
 	"context"
 	"fmt"
 	"github.com/samuel/go-zookeeper/zk"
@@ -21,6 +24,7 @@ const(
 
 type Master struct{
 	clientMasterPb.UnimplementedClientMasterServer
+	dataMasterPb.UnimplementedDataMasterServer
 
 	//Store the metadata of the nodes
 	dataNodeManager *DataNodeManager //key:value => ID:port
@@ -61,6 +65,12 @@ func (master *Master) WatchNewNode(conn *zk.Conn, path string) error{
 	return nil
 }
 
+func (master *Master) DataMasterReshardComplete(ctx context.Context, req *dataMasterPb.DataMasterReshardCompleteReq) (*dataMasterPb.DataMasterReshardCompleteResp, error){
+	utils.Debug("Reshard complete from a data node\n")
+	return &dataMasterPb.DataMasterReshardCompleteResp{
+		Message: "Hello 2 rpc server " + req.Message,
+	}, nil
+}
 
 func main(){
 	fmt.Println("Start to run master node...")
@@ -83,6 +93,8 @@ func main(){
 
 	s := grpc.NewServer()
 	clientMasterPb.RegisterClientMasterServer(s, &masterServer)
+	dataMasterPb.RegisterDataMasterServer(s, &masterServer)
+
 	fmt.Println("Register complete, ready to serve...")
 	if err := s.Serve(lis); err != nil{
 		log.Fatalf("err to serve: %v", err)

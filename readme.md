@@ -29,7 +29,10 @@
    1. 怎么加锁：使用一把全局的读写锁。每个client在向master请求RPC之前，无论是READ还是PUT，DELETE，都申请一把全局的读锁。而Master在注册的时候，申请一把全局的写锁。这样，只有没有client请求的时候，master会注册新的节点。
    2. 怎么reshard：
    
-   
+## Day5 
+* 尝试实现扩容：1.知道reshard的地址。2.做reshard。3.加锁 4.写测试
+* 注意:首先需要修改现有RPC的结构。DataMaster和MasterData要区分开。
+
 ## Notes
 * 注意一些不会自己清除的状态:
     1. 先shutdown master的话，DataNode不会删除
