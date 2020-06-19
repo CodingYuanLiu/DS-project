@@ -34,7 +34,9 @@
 * 注意:首先需要修改现有RPC的结构。DataMaster和MasterData要区分开。
 
 ## Notes
-* 注意一些不会自己清除的状态:
+* 注意一些不会自己清除的状态或者需要手动创建的状态:
     1. 先shutdown master的话，DataNode不会删除
-    2. readers/$port里面存着readers的数量。错误的情况下可能运行完之后不为0
-    3. locks/$port里面存着用来加锁的节点。不过这个正常情况下会自行消除。
+    2. /readers/$port里面存着readers的数量。错误的情况下可能运行完之后不为0
+    3. /locks/$port里面存着用来加锁的节点。不过这个正常情况下会自行消除。
+    4. /globalLock
+    5. /readers/global

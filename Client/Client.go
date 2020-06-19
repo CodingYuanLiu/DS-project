@@ -4,6 +4,7 @@ import (
 	"FinalProject/lock"
 	clientDataPb "FinalProject/proto/ClientData"
 	clientMasterPb "FinalProject/proto/ClientMaster"
+	"FinalProject/utils"
 	"context"
 	"fmt"
 	"google.golang.org/grpc"
@@ -21,6 +22,7 @@ type Client struct{
 	rpcMasterCli  clientMasterPb.ClientMasterClient
 	rpcDataCli  map[string] clientDataPb.ClientDataClient //key-value : port-client
 	rwLocks map[string] lock.RwLock //stores the locks of all the data nodes. key-value : port-lock
+	globalRwLock lock.GlobalRwLock
 }
 
 func NewClient() *Client{
@@ -33,6 +35,7 @@ func NewClient() *Client{
 		rpcMasterCli: client,
 		rpcDataCli: map[string] clientDataPb.ClientDataClient{},
 		rwLocks: map[string] lock.RwLock{},
+		globalRwLock: lock.NewGlobalRwLock(),
 	}
 }
 
@@ -48,6 +51,11 @@ func (cli *Client) GetDataNodePort(key string) (string,error){
 	return masterResp.Port, nil
 }
 func (cli *Client) Put(key string, value string) error {
+	if err := cli.globalRwLock.LockReader(); err != nil{
+		utils.Error("UnlockReader error in Delete: %v\n", err)
+		return err
+	}
+
 	port, err := cli.GetDataNodePort(key)
 	if err != nil{
 		log.Fatalf("Get data node from master error: %v\n", err)
@@ -81,12 +89,20 @@ func (cli *Client) Put(key string, value string) error {
 		log.Printf("[error] unlock writer error: %v\n", err)
 		return err
 	}
+	if err := cli.globalRwLock.UnlockReader(); err != nil{
+		utils.Error("UnlockReader error in Delete: %v\n", err)
+		return err
+	}
 	log.Printf("Put %v:%v to data node (port \"%v\") succeed\nmessage: %v\n",
 		key, value, port, dataResp.Message)
 	return nil
 }
 
 func (cli *Client) Read(key string) (string, error){
+	if err := cli.globalRwLock.LockReader(); err != nil{
+		utils.Error("LockReader error in Read: %v\n", err)
+		return "", err
+	}
 	port, err := cli.GetDataNodePort(key)
 	if err != nil{
 		log.Fatalf("Get data node from master.exe error: %v\n", err)
@@ -116,12 +132,22 @@ func (cli *Client) Read(key string) (string, error){
 		return "", err
 	}
 	value := dataResp.Value
+
+	if err := cli.globalRwLock.UnlockReader(); err != nil{
+		utils.Error("UnlockReader error in Read: %v\n", err)
+		return "", err
+	}
 	log.Printf("Read %v:%v from data node (port \"%v\") succeed\nmessage: %v\n",
 		key, value, port, dataResp.Message)
 	return value, nil
 }
 
 func (cli *Client) Delete(key string) error{
+	if err := cli.globalRwLock.LockReader(); err != nil{
+		utils.Error("LockReader error in Delete: %v\n", err)
+		return err
+	}
+
 	port, err := cli.GetDataNodePort(key)
 	if err != nil{
 		log.Fatalf("Get data node from master error: %v\n", err)
@@ -150,6 +176,11 @@ func (cli *Client) Delete(key string) error{
 	if err := rwLock.UnlockWriter(); err!= nil{
 		return err
 	}
+	if err := cli.globalRwLock.UnlockReader(); err != nil{
+		utils.Error("UnlockReader error in Delete: %v\n", err)
+		return err
+	}
+
 	log.Printf("Delete %v from data node (port \"%v\") succeed\nmessage: %v\n",
 		key, port, dataResp.Message)
 	return nil

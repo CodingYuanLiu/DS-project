@@ -38,8 +38,8 @@ func (dataServer *DataServer) ClientDataRead(ctx context.Context, req *clientDat
 	if !exist{
 		return nil, errors.New("no value in the database")
 	}
-	log.Printf("read key: %v, value: %v\n", req.Key, value)
-	log.Println(dataServer.database)
+	utils.Debug("read key: %v, value: %v\n", req.Key, value)
+	utils.Debug("database now: %v\n", dataServer.database)
 	return &clientDataPb.ClientDataReadResp{
 		Value: value,
 		Message: "[Data server]: read succeed",
@@ -129,6 +129,9 @@ func (dataServer *DataServer) doDataMigration(mapDestination map[string] string)
 		if err != nil{
 			utils.Error("Migrate data rpc request error: %v\n", err)
 			return err
+		}
+		for migrateKey,_ := range migrateKeyValues{
+			delete(dataServer.database, migrateKey)
 		}
 		utils.Debug("Migrate data succeed, rpc response: %v\n", resp.Message)
 	}

@@ -5,4 +5,6 @@ const (
 	readerLockPath    = "/readerLock"
 	writerLockPath    = "/writerLock"
 	ReaderNumRootPath = "/readers"
+	globalLockPath = "/globalLock"
+	globalReaderPath = "/global" /* i.e., /readers/global */
 )

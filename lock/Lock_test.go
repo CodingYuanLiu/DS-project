@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/samuel/go-zookeeper/zk"
 	"log"
+	"testing"
 	"time"
 )
 
@@ -159,6 +160,54 @@ func testRwLock(){
 	go testRwLockThreadWrite(c, 3)
 	go testRwLockThreadRead(c, 4)
 
+	for i := 0; i < threadNum; i++{
+		fmt.Println(<-c)
+	}
+
+}
+
+func testGlobalRwLockThreadWrite(c chan string, ID int){
+	rwLock := NewGlobalRwLock()
+	err := rwLock.LockWriter()
+	if err != nil{
+		log.Println(err)
+	}
+	for i := 1; i < 5; i++{
+		fmt.Printf("thread %d write\n", ID)
+		time.Sleep(time.Second)
+	}
+	err = rwLock.UnlockWriter()
+	if err != nil{
+		log.Printf("release lock err: %v\n", err)
+	}
+	c<- fmt.Sprintf("thread %d finished", ID)
+}
+
+func testGlobalRwLockThreadRead(c chan string, ID int){
+	rwLock := NewGlobalRwLock()
+	err := rwLock.LockReader()
+	if err != nil{
+		log.Println(err)
+	}
+	for i := 1; i < 5; i++{
+		fmt.Printf("thread %d read\n", ID)
+		time.Sleep(time.Second)
+	}
+	err = rwLock.UnlockReader()
+	if err != nil{
+		log.Printf("release lock err: %v\n", err)
+	}
+	c<- fmt.Sprintf("thread %d finished", ID)
+}
+
+func TestGlobalRwLock(t *testing.T) {
+	threadNum := 5
+	c := make(chan string, threadNum)
+	go testGlobalRwLockThreadRead(c, 0)
+	go testGlobalRwLockThreadRead(c, 1)
+	go testGlobalRwLockThreadWrite(c, 2)
+	go testGlobalRwLockThreadWrite(c, 3)
+	go testGlobalRwLockThreadRead(c, 4)
 	for i := 0; i < threadNum; i++{
 		fmt.Println(<-c)
 	}

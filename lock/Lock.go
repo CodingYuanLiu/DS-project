@@ -30,7 +30,7 @@ func NewLock(conn *zk.Conn, path string) *Lock{
 func (l *Lock) Lock() error{
 	exist, _, err := l.conn.Exists(l.lockRootPath)
 	if !exist{
-		fmt.Println("the lock path does not exist")
+		utils.Debug("the lock path does not exist")
 		if _, err := l.conn.Create(l.lockRootPath, []byte{}, 0, zk.WorldACL(zk.PermAll)); err != nil{
 			log.Printf("create lock path %v err: %v\n", l.lockRootPath, err)
 			return err

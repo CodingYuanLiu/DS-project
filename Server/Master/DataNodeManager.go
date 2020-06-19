@@ -25,6 +25,7 @@ type DataNodeManager struct{
 	hashRing *HashRing
 	dataNodesSet map[string] *DataNode //The set of data nodes. The int value is use to do heart beat detection.
 	nodeNum      int
+	globalRwLock lock.GlobalRwLock
 }
 
 
@@ -61,6 +62,7 @@ func NewDataNodeManager(conn *zk.Conn) (*DataNodeManager, error){
 		nodeNum: nodeNum,
 		dataNodesSet: map[string] *DataNode{},
 		conn: conn,
+		globalRwLock: lock.NewGlobalRwLock(),
 	}, nil
 }
 
@@ -77,17 +79,15 @@ func (dataNodeManager DataNodeManager)DeleteDataNode(port string) error{
 
 func (dataNodeManager DataNodeManager)RegisterDataNode(port string) error{
 	//TODO: lock the master node and corresponding data node when register is undone
-
-	/*
-	//Register the Node at NodeMeta
-	UUID := uuid.New()
-	dataNodeManager.nodeMeta[UUID] = NewDataNode(port)
-	*/
-
+	err := dataNodeManager.globalRwLock.LockWriter()
+	if err != nil{
+		utils.Error("LockWriter error in RegisterDataNode: %v\n", err)
+		return err
+	}
 	//Register the Node at hashRing
 	dataNodeManager.hashRing.AddNode(port, 1)
 	//TODO: do the data migration
-	err := dataNodeManager.DataReshard()
+	err = dataNodeManager.DataReshard()
 
 	if err != nil{
 		utils.Error("DataReshard in RegisterDataNode error: %v\n", err)
@@ -98,6 +98,11 @@ func (dataNodeManager DataNodeManager)RegisterDataNode(port string) error{
 	go dataNodeManager.HeartBeatDetection(port)
 
 	//TODO: unlock
+	err = dataNodeManager.globalRwLock.UnlockWriter()
+	if err != nil{
+		utils.Error("LockWriter error in RegisterDataNode: %v\n", err)
+		return err
+	}
 	return nil
 }
 
