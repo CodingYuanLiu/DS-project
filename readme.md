@@ -33,6 +33,20 @@
 * 尝试实现扩容：1.知道reshard的地址。2.做reshard。3.加锁 4.写测试
 * 注意:首先需要修改现有RPC的结构。DataMaster和MasterData要区分开。
 
+## Day6
+* 尝试实现容错
+* TODO写在注释里面了。
+  * backup需要注册，并创建/BackupNode/$dataPort/$backupPort 的znode节点，用来做心跳检测
+  * master需要同时监听znode来注册backupnode，然后建立和backup node的心跳检测。
+  * backup注册完成之后要和data server保持数据同步，因此注册的时候要首先做一次数据迁移。
+  * 注册过程记得加锁，加锁，加锁。考虑好如何加锁
+* 容错：
+  * data挂了以后，心跳检测失败，如果有backup存在，则通知backup变成data server
+  * 这个过程需要对port加写锁。如果有req先抢到锁，他们可能会失败返回error（或者更糟糕的是直接block住导致死锁）
+  * 因此明天必须要先测试一下是会block还是会返回error
+  
+  
+
 ## Notes
 * 注意一些不会自己清除的状态或者需要手动创建的状态:
     1. 先shutdown master的话，DataNode不会删除

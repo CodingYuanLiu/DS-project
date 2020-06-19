@@ -16,11 +16,6 @@ import (
 )
 
 
-// Interfaces: PUT, DELETE, READ
-const(
-	masterPort = ":7000"
-	dataNodesPath = "/DataNode" //The root node of the data nodes' ports
-)
 
 type Master struct{
 	clientMasterPb.UnimplementedClientMasterServer
@@ -56,8 +51,8 @@ func ConnectZookeeper() *zk.Conn{
 	return zkConn
 }
 
-func (master *Master) WatchNewNode(conn *zk.Conn, path string) error{
-	err := master.dataNodeManager.WatchNewNode(conn, path)
+func (master *Master) WatchNewDataNode(conn *zk.Conn, path string) error{
+	err := master.dataNodeManager.WatchNewDataNode(conn, path)
 	if err != nil{
 		log.Printf("Master: watch new node error: %v\n", err)
 		return err
@@ -89,7 +84,7 @@ func main(){
 		dataNodeManager: dataNodeManager,
 	}
 
-	go masterServer.WatchNewNode(zkConn, dataNodesPath)
+	go masterServer.WatchNewDataNode(zkConn, dataNodesPath)
 
 	s := grpc.NewServer()
 	clientMasterPb.RegisterClientMasterServer(s, &masterServer)

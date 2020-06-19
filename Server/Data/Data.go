@@ -5,6 +5,7 @@ import (
 	clientDataPb "FinalProject/proto/ClientData"
 	dataDataPb "FinalProject/proto/DataData"
 	masterDataPb "FinalProject/proto/MasterData"
+	"FinalProject/utils"
 	"errors"
 	"fmt"
 	"github.com/samuel/go-zookeeper/zk"
@@ -15,12 +16,12 @@ import (
 	"time"
 )
 const(
-	port1 = ":7777"
-	dataNodesPath = "/DataNode" //The root node of the data nodes' ports
-	aliveResp = "Alive"
-	aliveReq = "Is alive?"
-	masterPort = ":7000"
-	defaultIP = "localhost"
+	defaultDataPort = ":7777"
+	dataNodesPath   = "/DataNode" //The root node of the data nodes' ports
+	aliveResp       = "Alive"
+	aliveReq        = "Is alive?"
+	masterPort      = ":7000"
+	defaultIP       = "localhost"
 )
 
 func ConnectZookeeper() *zk.Conn{
@@ -98,21 +99,11 @@ func HeartBeatResponse(conn *zk.Conn, port string) error{
 	}
 }
 
-func main() {
-	port := port1
-	if len(os.Args) > 1 {
-		port = os.Args[1]
-	}
-	lis, err := net.Listen("tcp", port)
-	fmt.Printf("Data node listening port %v...\n", port)
-
-	if err != nil{
-		log.Fatal(err)
-	}
+func InitializeDataServer(lis net.Listener, port string){
 	grpcServer := grpc.NewServer()
 	zkConn := ConnectZookeeper()
 
-	err = ZkRegisterDataNodePort(zkConn, port)
+	err := ZkRegisterDataNodePort(zkConn, port)
 	if err != nil{
 		log.Fatalf("Register data node to zookeeper error: %v\n", err)
 	}
@@ -126,15 +117,16 @@ func main() {
 
 	//TEST
 	/*
-	ctx, cancel := context.WithTimeout(context.Background(), 5 * time.Second)
-	defer cancel()
-	resp, _ := dataServer.dataMasterCli.DataMasterReshardComplete(ctx, &dataMasterPb.DataMasterReshardCompleteReq{
-		Message: "reshard complete",
-	})
-	utils.Debug("Response from master via rpc: %v\n", resp.Message)
-	 */
+		ctx, cancel := context.WithTimeout(context.Background(), 5 * time.Second)
+		defer cancel()
+		resp, _ := dataServer.dataMasterCli.DataMasterReshardComplete(ctx, &dataMasterPb.DataMasterReshardCompleteReq{
+			Message: "reshard complete",
+		})
+		utils.Debug("Response from master via rpc: %v\n", resp.Message)
+	*/
 	//END TEST
 
+	//Register rpc servers
 	clientDataPb.RegisterClientDataServer(grpcServer, dataServer)
 	masterDataPb.RegisterMasterDataServer(grpcServer, dataServer)
 	dataDataPb.RegisterDataDataServer(grpcServer, dataServer)
@@ -142,4 +134,25 @@ func main() {
 	if err = grpcServer.Serve(lis); err != nil{
 		log.Fatal(err)
 	}
+}
+
+func main() {
+	port := defaultDataPort
+	if len(os.Args) > 1 {
+		port = os.Args[1]
+	}
+	lis, err := net.Listen("tcp", port)
+	fmt.Printf("Data node listening port %v...\n", port)
+
+	if err != nil{
+		//TODO: err so register backup server
+		if err := InitializeBackupServer(port); err != nil{
+			utils.Error("Initialize backup server error: %v\n", err)
+			log.Fatal(err)
+		}
+		//Should never reach here
+		log.Fatal(err)
+	}
+
+	InitializeDataServer(lis, port)
 }

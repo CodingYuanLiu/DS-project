@@ -84,4 +84,5 @@ func TestLockScalabilityConcurrently(t *testing.T){
 	}
 	for i := 0; i < threadNum; i++{
 		fmt.Println(<-ch)
-	}}
+	}
+}
