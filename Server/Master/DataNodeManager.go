@@ -176,7 +176,6 @@ func (dataNodeManager DataNodeManager)HeartBeatDetection(port string) error{
 func (dataNodeManager DataNodeManager) HandleDataNodesChanges(ports []string) error{
 	//log.Printf("Node num: %d, ports: %v\n", dataNodeManager.nodeNum, ports)
 	//Node delete
-	log.Printf("[Debug] Handle DataNode Changes: new ports: %v, old ports: %v\n", ports, dataNodeManager.dataNodesSet)
 	if len(ports) < dataNodeManager.nodeNum{
 		newPortsMap := map[string] bool{}
 		for _, port := range ports{

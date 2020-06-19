@@ -18,13 +18,13 @@ package DataData;
 
 //use to reshard the datas
 service DataData {
-  rpc ClientMasterFindDataNode (ClientMasterFindDataNodeReq) returns (ClientMasterFindDataNodeResp) {}
+  rpc DataDataMigrate (DataDataMigrateReq) returns (DataDataMigrateResp) {}
 }
 
-message ClientMasterFindDataNodeReq {
-  string Key = 1;
+message DataDataMigrateReq {
+  bytes KeyValues = 1;
 }
 
-message ClientMasterFindDataNodeResp {
-  string Port = 1;
+message DataDataMigrateResp {
+  string Message = 1;
 }

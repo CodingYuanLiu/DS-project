@@ -156,7 +156,7 @@ func (cli *Client) Delete(key string) error{
 }
 
 func (cli *Client) GetDataCli(port string) clientDataPb.ClientDataClient{
-	if client, exist := cli.rpcDataCli["port"]; exist {
+	if client, exist := cli.rpcDataCli[port]; exist {
 		return client
 	}
 	log.Printf("New connection to data node at port %v\n", port)
@@ -166,7 +166,7 @@ func (cli *Client) GetDataCli(port string) clientDataPb.ClientDataClient{
 		log.Fatalf("did not connect: %v", err)
 	}
 	client := clientDataPb.NewClientDataClient(conn)
-	cli.rpcDataCli["port"] = client
+	cli.rpcDataCli[port] = client
 
 	return client
 }

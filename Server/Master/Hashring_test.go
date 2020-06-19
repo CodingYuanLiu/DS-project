@@ -1,6 +1,7 @@
 package main
 
 import (
+	"log"
 	"testing"
 )
 
@@ -79,5 +80,32 @@ func TestHash(t *testing.T) {
 	}
 	c1, c2, c3 = getNodesCount(hash.nodes)
 	t.Logf("len of nodes is %v after AddNode node1:%v, node2:%v, node3:%v", len(hash.nodes), c1, c2, c3)
+
+}
+
+func TestHash_My(t *testing.T){
+	nodeWeight := make(map[string]int)
+	n1 := ":7777"
+	n2 := ":2200"
+	nodeWeight[n1] = 1
+	vitualSpots := 100
+	hash := NewHashRing(vitualSpots)
+	t.Logf("empty get: %s\n", hash.GetNode("key1"))
+	hash.AddNodes(nodeWeight)
+	log.Printf("get 1: %v\n", hash.GetNode("testkey1"))
+	log.Printf("get 2: %v\n", hash.GetNode("testkey2"))
+	log.Printf("get 3: %v\n", hash.GetNode("testkeya"))
+
+	hash.AddNode(n2, 1)
+	log.Printf("Add node\n")
+	log.Printf("get 1: %v\n", hash.GetNode("testkey1"))
+	log.Printf("get 2: %v\n", hash.GetNode("testkey2"))
+	log.Printf("get 3: %v\n", hash.GetNode("testkeya"))
+
+	hash.RemoveNode(n2)
+	log.Printf("Remove node\n")
+	log.Printf("get 1: %v\n", hash.GetNode("testkey1"))
+	log.Printf("get 2: %v\n", hash.GetNode("testkey2"))
+	log.Printf("get 3: %v\n", hash.GetNode("testkeya"))
 
 }

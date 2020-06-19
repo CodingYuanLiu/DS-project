@@ -2,7 +2,7 @@ package main
 
 import (
 	clientDataPb "FinalProject/proto/ClientData"
-	dataMasterPb "FinalProject/proto/DataMaster"
+	dataDataPb "FinalProject/proto/DataData"
 	masterDataPb "FinalProject/proto/MasterData"
 	"FinalProject/utils"
 	"context"
@@ -10,15 +10,16 @@ import (
 	"fmt"
 	"google.golang.org/grpc"
 	"log"
+	"time"
 )
 
 type DataServer struct{
 	clientDataPb.UnimplementedClientDataServer
 	masterDataPb.UnimplementedMasterDataServer
-
+	dataDataPb.UnimplementedDataDataServer
 	port string
 	database map[string] string
-	dataMasterCli dataMasterPb.DataMasterClient
+	//dataMasterCli dataMasterPb.DataMasterClient
 }
 
 func (dataServer *DataServer) ClientDataPut(ctx context.Context, req *clientDataPb.ClientDataPutReq) (*clientDataPb.ClientDataPutResp, error){
@@ -73,17 +74,63 @@ func (dataServer *DataServer) MasterDataReshardDestination(ctx context.Context, 
 	mapDestination := utils.ByteToKeyValueMap(req.KeyDestination)
 	utils.Debug("Receive reshard instructions: %v\n", mapDestination)
 	//TODO: data migration
+	err := dataServer.doDataMigration(mapDestination)
+	if err != nil{
+		utils.Error("doDataMigration error in MasterDataReshardDestination: %v\n", err)
+		return nil, err
+	}
 	return &masterDataPb.MasterDataReshardDestinationResp{
 		Message: fmt.Sprintf("data server on port %s migration complete", dataServer.port),
 	}, nil
 }
 
-func NewDataMasterCli() dataMasterPb.DataMasterClient{
-	masterAddress := fmt.Sprintf("%s%s", defaultIP, masterPort)
-	conn, err := grpc.Dial(masterAddress, grpc.WithInsecure(), grpc.WithBlock())
+func (dataServer *DataServer) DataDataMigrate(ctx context.Context, req *dataDataPb.DataDataMigrateReq) (*dataDataPb.DataDataMigrateResp, error){
+	mapData := utils.ByteToKeyValueMap(req.KeyValues)
+	utils.Debug("migrated data: %v\n", mapData)
+	dataServer.database = mapData
+	return &dataDataPb.DataDataMigrateResp{
+		Message: "migration complete",
+	}, nil
+}
+
+func NewDataDataCli(port string) dataDataPb.DataDataClient{
+	dataAddress := fmt.Sprintf("%s%s", defaultIP, port)
+	conn, err := grpc.Dial(dataAddress, grpc.WithInsecure(), grpc.WithBlock())
 	if err != nil {
 		log.Fatalf("can not connect to master: %v", err)
 	}
-	dataMasterCli := dataMasterPb.NewDataMasterClient(conn)
-	return dataMasterCli
+	dataDataCli := dataDataPb.NewDataDataClient(conn)
+	return dataDataCli
+}
+
+func (dataServer *DataServer) doDataMigration(mapDestination map[string] string) error {
+	migrateKeyValues := map[string] string{}
+	dest := ""
+	for key, destPort := range mapDestination{
+		if destPort != dataServer.port{
+			migrateKeyValues[key] = dataServer.database[key]
+			if dest == ""{
+				dest = destPort
+			} else if dest != destPort{
+				utils.Error("Data migration error: multiple destination port: %s and %s\n", dest, destPort)
+				return errors.New("data migration error: multiple destination port")
+			}
+
+		}
+	}
+	//Need to migrate
+	if dest != ""{
+		cli := NewDataDataCli(dest)
+		ctx, cancel := context.WithTimeout(context.Background(), 5 * time.Second)
+		defer cancel()
+		resp, err := cli.DataDataMigrate(ctx, &dataDataPb.DataDataMigrateReq{
+			KeyValues: utils.KeyValueMapToByte(migrateKeyValues),
+		})
+		if err != nil{
+			utils.Error("Migrate data rpc request error: %v\n", err)
+			return err
+		}
+		utils.Debug("Migrate data succeed, rpc response: %v\n", resp.Message)
+	}
+	return nil
 }

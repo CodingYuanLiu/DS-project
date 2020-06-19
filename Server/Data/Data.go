@@ -3,6 +3,7 @@ package main
 import (
 	"FinalProject/lock"
 	clientDataPb "FinalProject/proto/ClientData"
+	dataDataPb "FinalProject/proto/DataData"
 	masterDataPb "FinalProject/proto/MasterData"
 	"errors"
 	"fmt"
@@ -108,7 +109,7 @@ func main() {
 	if err != nil{
 		log.Fatal(err)
 	}
-	newServer := grpc.NewServer()
+	grpcServer := grpc.NewServer()
 	zkConn := ConnectZookeeper()
 
 	err = ZkRegisterDataNodePort(zkConn, port)
@@ -119,7 +120,7 @@ func main() {
 	go HeartBeatResponse(zkConn, port)
 	dataServer := &DataServer{
 		database: map[string]string{},
-		dataMasterCli: NewDataMasterCli(),
+		//dataMasterCli: NewDataMasterCli(),
 		port: port,
 	}
 
@@ -134,10 +135,11 @@ func main() {
 	 */
 	//END TEST
 
-	clientDataPb.RegisterClientDataServer(newServer, dataServer)
-	masterDataPb.RegisterMasterDataServer(newServer, dataServer)
+	clientDataPb.RegisterClientDataServer(grpcServer, dataServer)
+	masterDataPb.RegisterMasterDataServer(grpcServer, dataServer)
+	dataDataPb.RegisterDataDataServer(grpcServer, dataServer)
 
-	if err = newServer.Serve(lis); err != nil{
+	if err = grpcServer.Serve(lis); err != nil{
 		log.Fatal(err)
 	}
 }
