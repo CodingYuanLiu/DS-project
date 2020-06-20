@@ -21,7 +21,7 @@ type DataNodeManager struct{
 	dataNodesSet map[string] *DataNode //The set of data nodes. The int value is use to do heart beat detection.
 	nodeNum      int
 	globalRwLock lock.GlobalRwLock
-	backupNodeManager BackupNodeManager
+	backupNodeManager *BackupNodeManager
 }
 
 
@@ -30,12 +30,17 @@ type DataNode struct{
 	client masterDataPb.MasterDataClient
 }
 
-func NewDataNode(port string) *DataNode{
+func GetDataCli(port string) masterDataPb.MasterDataClient{
 	conn, err := grpc.Dial(port, grpc.WithInsecure(), grpc.WithBlock())
 	if err != nil {
 		log.Fatalf("did not connect: %v", err)
 	}
 	cli := masterDataPb.NewMasterDataClient(conn)
+	return cli
+}
+
+func NewDataNode(port string) *DataNode{
+	cli := GetDataCli(port)
 	return &DataNode{
 		heartBeatFailures: 0,
 		client: cli,
@@ -52,6 +57,11 @@ func NewDataNodeManager(conn *zk.Conn) (*DataNodeManager, error){
 	} else if err != nil{
 		return nil, err
 	}
+	backupNodeManager, err := NewBackupNodeManager(conn)
+	if err != nil{
+		utils.Error("NewBackupNodeManager in NewDataNodeManager error: %v\n", err)
+		return nil, err
+	}
 	return &DataNodeManager{
 		hashRing: hashRing,
 		//nodeMeta: nodeMeta,
@@ -59,6 +69,7 @@ func NewDataNodeManager(conn *zk.Conn) (*DataNodeManager, error){
 		dataNodesSet: map[string] *DataNode{},
 		conn: conn,
 		globalRwLock: lock.NewGlobalRwLock(),
+		backupNodeManager: backupNodeManager,
 	}, nil
 }
 
@@ -82,17 +93,18 @@ func (dataNodeManager DataNodeManager)RegisterDataNode(port string) error{
 	//Register the Node at hashRing
 	dataNodeManager.hashRing.AddNode(port, 1)
 	err = dataNodeManager.DataReshard()
-
 	if err != nil{
 		utils.Error("DataReshard in RegisterDataNode error: %v\n", err)
 	}
 
 	dataNodeManager.nodeNum += 1
 	dataNodeManager.dataNodesSet[port] = NewDataNode(port)
-	//TODO: Initialize the znode of the backup server, backupnode manager will get the information
+
+	//Initialization about backup
+	//dataNodeManager.InitializeBackupZnode(port)
+	go dataNodeManager.backupNodeManager.WatchNewBackupNodes(port)
 
 	go dataNodeManager.HeartBeatDetection(port)
-
 	err = dataNodeManager.globalRwLock.UnlockWriter()
 	if err != nil{
 		utils.Error("LockWriter error in RegisterDataNode: %v\n", err)
@@ -101,6 +113,26 @@ func (dataNodeManager DataNodeManager)RegisterDataNode(port string) error{
 	return nil
 }
 
+func (dataNodeManager *DataNodeManager)InitializeBackupZnode(port string) error{
+	path := fmt.Sprintf("%s/%s", backupNodesPath, port)
+	exist, _, err := dataNodeManager.conn.Exists(path)
+	if exist{
+		utils.Debug("Backup root node of port %s is already created\n", port)
+		return nil
+	} else if err != nil && err != zk.ErrNoNode{
+		utils.Error("Check backup root node of port %s existence error: %v\n", port, err)
+		return err
+	}
+	_, err = dataNodeManager.conn.Create(path, []byte{}, zk.FlagEphemeral, zk.WorldACL(zk.PermAll))
+	if err != nil{
+		utils.Error("Can not create backup root node of port %s: %v ", port, err)
+		return err
+	}
+
+	//TODO: Watch the node to register new backup nodes
+
+	return nil
+}
 func (dataNodeManager DataNodeManager)DataReshard() error{
 	for _, dataNode := range dataNodeManager.dataNodesSet{
 		ctx, cancel := context.WithTimeout(context.Background(), 5 * time.Second)
@@ -139,7 +171,7 @@ func (dataNodeManager DataNodeManager)HeartBeatDetection(port string) error{
 	zkNodeExist, _, _ := dataNodeManager.conn.Exists(nodePath)
 	_, dataNodeExist := dataNodeManager.dataNodesSet[port]
 	if !(zkNodeExist && dataNodeExist){
-		log.Printf("Error: no node to detect heart beat\n")
+		utils.Error("No node to detect heart beat\n")
 		return errors.New("no zk node or no data node in data node set")
 	}
 
@@ -171,7 +203,7 @@ func (dataNodeManager DataNodeManager)HeartBeatDetection(port string) error{
 				return err
 			}
 		}
-		time.Sleep(time.Duration(heartBeatTimeInterval)*time.Second)
+		time.Sleep(time.Duration(heartBeatTimeInterval) * time.Second)
 	}
 
 	return nil
@@ -211,7 +243,8 @@ func (dataNodeManager DataNodeManager) HandleDataNodesChanges(ports []string) er
 	return nil
 }
 
-func (dataNodeManager *DataNodeManager) WatchNewDataNode(conn *zk.Conn, path string) error {
+func (dataNodeManager *DataNodeManager) WatchNewDataNode(path string) error {
+	conn := dataNodeManager.conn
 	exist, _, err := conn.Exists(path)
 	if err != nil{
 		fmt.Println(err)
@@ -240,7 +273,7 @@ func (dataNodeManager *DataNodeManager) WatchNewDataNode(conn *zk.Conn, path str
 					if err != nil{
 						return err
 					}
-					fmt.Printf("[Debug] value of path[%s]=[%s].\n", path, v)
+					utils.Debug("value of path[%s]=[%s].\n", path, v)
 					if err := dataNodeManager.HandleDataNodesChanges(v); err != nil{
 						log.Printf("Handle data nodes change error: %v\n", err)
 					}

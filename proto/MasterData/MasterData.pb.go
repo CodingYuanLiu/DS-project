@@ -234,6 +234,194 @@ func (x *MasterDataReshardDestinationResp) GetMessage() string {
 	return ""
 }
 
+type MasterDataRegisterBackupToDataReq struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	BackupPort string `protobuf:"bytes,1,opt,name=BackupPort,proto3" json:"BackupPort,omitempty"`
+}
+
+func (x *MasterDataRegisterBackupToDataReq) Reset() {
+	*x = MasterDataRegisterBackupToDataReq{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_proto_MasterData_MasterData_proto_msgTypes[4]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *MasterDataRegisterBackupToDataReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*MasterDataRegisterBackupToDataReq) ProtoMessage() {}
+
+func (x *MasterDataRegisterBackupToDataReq) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_MasterData_MasterData_proto_msgTypes[4]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use MasterDataRegisterBackupToDataReq.ProtoReflect.Descriptor instead.
+func (*MasterDataRegisterBackupToDataReq) Descriptor() ([]byte, []int) {
+	return file_proto_MasterData_MasterData_proto_rawDescGZIP(), []int{4}
+}
+
+func (x *MasterDataRegisterBackupToDataReq) GetBackupPort() string {
+	if x != nil {
+		return x.BackupPort
+	}
+	return ""
+}
+
+type MasterDataRegisterBackupToDataResp struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Message string `protobuf:"bytes,1,opt,name=Message,proto3" json:"Message,omitempty"`
+}
+
+func (x *MasterDataRegisterBackupToDataResp) Reset() {
+	*x = MasterDataRegisterBackupToDataResp{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_proto_MasterData_MasterData_proto_msgTypes[5]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *MasterDataRegisterBackupToDataResp) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*MasterDataRegisterBackupToDataResp) ProtoMessage() {}
+
+func (x *MasterDataRegisterBackupToDataResp) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_MasterData_MasterData_proto_msgTypes[5]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use MasterDataRegisterBackupToDataResp.ProtoReflect.Descriptor instead.
+func (*MasterDataRegisterBackupToDataResp) Descriptor() ([]byte, []int) {
+	return file_proto_MasterData_MasterData_proto_rawDescGZIP(), []int{5}
+}
+
+func (x *MasterDataRegisterBackupToDataResp) GetMessage() string {
+	if x != nil {
+		return x.Message
+	}
+	return ""
+}
+
+type MasterDataDeleteBackupOfDataReq struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	BackupPort string `protobuf:"bytes,1,opt,name=BackupPort,proto3" json:"BackupPort,omitempty"`
+}
+
+func (x *MasterDataDeleteBackupOfDataReq) Reset() {
+	*x = MasterDataDeleteBackupOfDataReq{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_proto_MasterData_MasterData_proto_msgTypes[6]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *MasterDataDeleteBackupOfDataReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*MasterDataDeleteBackupOfDataReq) ProtoMessage() {}
+
+func (x *MasterDataDeleteBackupOfDataReq) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_MasterData_MasterData_proto_msgTypes[6]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use MasterDataDeleteBackupOfDataReq.ProtoReflect.Descriptor instead.
+func (*MasterDataDeleteBackupOfDataReq) Descriptor() ([]byte, []int) {
+	return file_proto_MasterData_MasterData_proto_rawDescGZIP(), []int{6}
+}
+
+func (x *MasterDataDeleteBackupOfDataReq) GetBackupPort() string {
+	if x != nil {
+		return x.BackupPort
+	}
+	return ""
+}
+
+type MasterDataDeleteBackupOfDataResp struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Message string `protobuf:"bytes,1,opt,name=Message,proto3" json:"Message,omitempty"`
+}
+
+func (x *MasterDataDeleteBackupOfDataResp) Reset() {
+	*x = MasterDataDeleteBackupOfDataResp{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_proto_MasterData_MasterData_proto_msgTypes[7]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *MasterDataDeleteBackupOfDataResp) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*MasterDataDeleteBackupOfDataResp) ProtoMessage() {}
+
+func (x *MasterDataDeleteBackupOfDataResp) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_MasterData_MasterData_proto_msgTypes[7]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use MasterDataDeleteBackupOfDataResp.ProtoReflect.Descriptor instead.
+func (*MasterDataDeleteBackupOfDataResp) Descriptor() ([]byte, []int) {
+	return file_proto_MasterData_MasterData_proto_rawDescGZIP(), []int{7}
+}
+
+func (x *MasterDataDeleteBackupOfDataResp) GetMessage() string {
+	if x != nil {
+		return x.Message
+	}
+	return ""
+}
+
 var File_proto_MasterData_MasterData_proto protoreflect.FileDescriptor
 
 var file_proto_MasterData_MasterData_proto_rawDesc = []byte{
@@ -255,23 +443,55 @@ var file_proto_MasterData_MasterData_proto_rawDesc = []byte{
 	0x61, 0x74, 0x61, 0x52, 0x65, 0x73, 0x68, 0x61, 0x72, 0x64, 0x44, 0x65, 0x73, 0x74, 0x69, 0x6e,
 	0x61, 0x74, 0x69, 0x6f, 0x6e, 0x52, 0x65, 0x73, 0x70, 0x12, 0x18, 0x0a, 0x07, 0x4d, 0x65, 0x73,
 	0x73, 0x61, 0x67, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x07, 0x4d, 0x65, 0x73, 0x73,
-	0x61, 0x67, 0x65, 0x32, 0xf7, 0x01, 0x0a, 0x0a, 0x4d, 0x61, 0x73, 0x74, 0x65, 0x72, 0x44, 0x61,
-	0x74, 0x61, 0x12, 0x6c, 0x0a, 0x17, 0x4d, 0x61, 0x73, 0x74, 0x65, 0x72, 0x44, 0x61, 0x74, 0x61,
-	0x49, 0x6e, 0x66, 0x6f, 0x72, 0x6d, 0x52, 0x65, 0x73, 0x68, 0x61, 0x72, 0x64, 0x12, 0x26, 0x2e,
-	0x4d, 0x61, 0x73, 0x74, 0x65, 0x72, 0x44, 0x61, 0x74, 0x61, 0x2e, 0x4d, 0x61, 0x73, 0x74, 0x65,
-	0x72, 0x44, 0x61, 0x74, 0x61, 0x49, 0x6e, 0x66, 0x6f, 0x72, 0x6d, 0x52, 0x65, 0x73, 0x68, 0x61,
-	0x72, 0x64, 0x52, 0x65, 0x71, 0x1a, 0x27, 0x2e, 0x4d, 0x61, 0x73, 0x74, 0x65, 0x72, 0x44, 0x61,
-	0x74, 0x61, 0x2e, 0x4d, 0x61, 0x73, 0x74, 0x65, 0x72, 0x44, 0x61, 0x74, 0x61, 0x49, 0x6e, 0x66,
-	0x6f, 0x72, 0x6d, 0x52, 0x65, 0x73, 0x68, 0x61, 0x72, 0x64, 0x52, 0x65, 0x73, 0x70, 0x22, 0x00,
-	0x12, 0x7b, 0x0a, 0x1c, 0x4d, 0x61, 0x73, 0x74, 0x65, 0x72, 0x44, 0x61, 0x74, 0x61, 0x52, 0x65,
+	0x61, 0x67, 0x65, 0x22, 0x43, 0x0a, 0x21, 0x4d, 0x61, 0x73, 0x74, 0x65, 0x72, 0x44, 0x61, 0x74,
+	0x61, 0x52, 0x65, 0x67, 0x69, 0x73, 0x74, 0x65, 0x72, 0x42, 0x61, 0x63, 0x6b, 0x75, 0x70, 0x54,
+	0x6f, 0x44, 0x61, 0x74, 0x61, 0x52, 0x65, 0x71, 0x12, 0x1e, 0x0a, 0x0a, 0x42, 0x61, 0x63, 0x6b,
+	0x75, 0x70, 0x50, 0x6f, 0x72, 0x74, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0a, 0x42, 0x61,
+	0x63, 0x6b, 0x75, 0x70, 0x50, 0x6f, 0x72, 0x74, 0x22, 0x3e, 0x0a, 0x22, 0x4d, 0x61, 0x73, 0x74,
+	0x65, 0x72, 0x44, 0x61, 0x74, 0x61, 0x52, 0x65, 0x67, 0x69, 0x73, 0x74, 0x65, 0x72, 0x42, 0x61,
+	0x63, 0x6b, 0x75, 0x70, 0x54, 0x6f, 0x44, 0x61, 0x74, 0x61, 0x52, 0x65, 0x73, 0x70, 0x12, 0x18,
+	0x0a, 0x07, 0x4d, 0x65, 0x73, 0x73, 0x61, 0x67, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52,
+	0x07, 0x4d, 0x65, 0x73, 0x73, 0x61, 0x67, 0x65, 0x22, 0x41, 0x0a, 0x1f, 0x4d, 0x61, 0x73, 0x74,
+	0x65, 0x72, 0x44, 0x61, 0x74, 0x61, 0x44, 0x65, 0x6c, 0x65, 0x74, 0x65, 0x42, 0x61, 0x63, 0x6b,
+	0x75, 0x70, 0x4f, 0x66, 0x44, 0x61, 0x74, 0x61, 0x52, 0x65, 0x71, 0x12, 0x1e, 0x0a, 0x0a, 0x42,
+	0x61, 0x63, 0x6b, 0x75, 0x70, 0x50, 0x6f, 0x72, 0x74, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52,
+	0x0a, 0x42, 0x61, 0x63, 0x6b, 0x75, 0x70, 0x50, 0x6f, 0x72, 0x74, 0x22, 0x3c, 0x0a, 0x20, 0x4d,
+	0x61, 0x73, 0x74, 0x65, 0x72, 0x44, 0x61, 0x74, 0x61, 0x44, 0x65, 0x6c, 0x65, 0x74, 0x65, 0x42,
+	0x61, 0x63, 0x6b, 0x75, 0x70, 0x4f, 0x66, 0x44, 0x61, 0x74, 0x61, 0x52, 0x65, 0x73, 0x70, 0x12,
+	0x18, 0x0a, 0x07, 0x4d, 0x65, 0x73, 0x73, 0x61, 0x67, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09,
+	0x52, 0x07, 0x4d, 0x65, 0x73, 0x73, 0x61, 0x67, 0x65, 0x32, 0xf8, 0x03, 0x0a, 0x0a, 0x4d, 0x61,
+	0x73, 0x74, 0x65, 0x72, 0x44, 0x61, 0x74, 0x61, 0x12, 0x6c, 0x0a, 0x17, 0x4d, 0x61, 0x73, 0x74,
+	0x65, 0x72, 0x44, 0x61, 0x74, 0x61, 0x49, 0x6e, 0x66, 0x6f, 0x72, 0x6d, 0x52, 0x65, 0x73, 0x68,
+	0x61, 0x72, 0x64, 0x12, 0x26, 0x2e, 0x4d, 0x61, 0x73, 0x74, 0x65, 0x72, 0x44, 0x61, 0x74, 0x61,
+	0x2e, 0x4d, 0x61, 0x73, 0x74, 0x65, 0x72, 0x44, 0x61, 0x74, 0x61, 0x49, 0x6e, 0x66, 0x6f, 0x72,
+	0x6d, 0x52, 0x65, 0x73, 0x68, 0x61, 0x72, 0x64, 0x52, 0x65, 0x71, 0x1a, 0x27, 0x2e, 0x4d, 0x61,
+	0x73, 0x74, 0x65, 0x72, 0x44, 0x61, 0x74, 0x61, 0x2e, 0x4d, 0x61, 0x73, 0x74, 0x65, 0x72, 0x44,
+	0x61, 0x74, 0x61, 0x49, 0x6e, 0x66, 0x6f, 0x72, 0x6d, 0x52, 0x65, 0x73, 0x68, 0x61, 0x72, 0x64,
+	0x52, 0x65, 0x73, 0x70, 0x22, 0x00, 0x12, 0x7b, 0x0a, 0x1c, 0x4d, 0x61, 0x73, 0x74, 0x65, 0x72,
+	0x44, 0x61, 0x74, 0x61, 0x52, 0x65, 0x73, 0x68, 0x61, 0x72, 0x64, 0x44, 0x65, 0x73, 0x74, 0x69,
+	0x6e, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x12, 0x2b, 0x2e, 0x4d, 0x61, 0x73, 0x74, 0x65, 0x72, 0x44,
+	0x61, 0x74, 0x61, 0x2e, 0x4d, 0x61, 0x73, 0x74, 0x65, 0x72, 0x44, 0x61, 0x74, 0x61, 0x52, 0x65,
 	0x73, 0x68, 0x61, 0x72, 0x64, 0x44, 0x65, 0x73, 0x74, 0x69, 0x6e, 0x61, 0x74, 0x69, 0x6f, 0x6e,
-	0x12, 0x2b, 0x2e, 0x4d, 0x61, 0x73, 0x74, 0x65, 0x72, 0x44, 0x61, 0x74, 0x61, 0x2e, 0x4d, 0x61,
-	0x73, 0x74, 0x65, 0x72, 0x44, 0x61, 0x74, 0x61, 0x52, 0x65, 0x73, 0x68, 0x61, 0x72, 0x64, 0x44,
-	0x65, 0x73, 0x74, 0x69, 0x6e, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x52, 0x65, 0x71, 0x1a, 0x2c, 0x2e,
-	0x4d, 0x61, 0x73, 0x74, 0x65, 0x72, 0x44, 0x61, 0x74, 0x61, 0x2e, 0x4d, 0x61, 0x73, 0x74, 0x65,
-	0x72, 0x44, 0x61, 0x74, 0x61, 0x52, 0x65, 0x73, 0x68, 0x61, 0x72, 0x64, 0x44, 0x65, 0x73, 0x74,
-	0x69, 0x6e, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x52, 0x65, 0x73, 0x70, 0x22, 0x00, 0x62, 0x06, 0x70,
-	0x72, 0x6f, 0x74, 0x6f, 0x33,
+	0x52, 0x65, 0x71, 0x1a, 0x2c, 0x2e, 0x4d, 0x61, 0x73, 0x74, 0x65, 0x72, 0x44, 0x61, 0x74, 0x61,
+	0x2e, 0x4d, 0x61, 0x73, 0x74, 0x65, 0x72, 0x44, 0x61, 0x74, 0x61, 0x52, 0x65, 0x73, 0x68, 0x61,
+	0x72, 0x64, 0x44, 0x65, 0x73, 0x74, 0x69, 0x6e, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x52, 0x65, 0x73,
+	0x70, 0x22, 0x00, 0x12, 0x81, 0x01, 0x0a, 0x1e, 0x4d, 0x61, 0x73, 0x74, 0x65, 0x72, 0x44, 0x61,
+	0x74, 0x61, 0x52, 0x65, 0x67, 0x69, 0x73, 0x74, 0x65, 0x72, 0x42, 0x61, 0x63, 0x6b, 0x75, 0x70,
+	0x54, 0x6f, 0x44, 0x61, 0x74, 0x61, 0x12, 0x2d, 0x2e, 0x4d, 0x61, 0x73, 0x74, 0x65, 0x72, 0x44,
+	0x61, 0x74, 0x61, 0x2e, 0x4d, 0x61, 0x73, 0x74, 0x65, 0x72, 0x44, 0x61, 0x74, 0x61, 0x52, 0x65,
+	0x67, 0x69, 0x73, 0x74, 0x65, 0x72, 0x42, 0x61, 0x63, 0x6b, 0x75, 0x70, 0x54, 0x6f, 0x44, 0x61,
+	0x74, 0x61, 0x52, 0x65, 0x71, 0x1a, 0x2e, 0x2e, 0x4d, 0x61, 0x73, 0x74, 0x65, 0x72, 0x44, 0x61,
+	0x74, 0x61, 0x2e, 0x4d, 0x61, 0x73, 0x74, 0x65, 0x72, 0x44, 0x61, 0x74, 0x61, 0x52, 0x65, 0x67,
+	0x69, 0x73, 0x74, 0x65, 0x72, 0x42, 0x61, 0x63, 0x6b, 0x75, 0x70, 0x54, 0x6f, 0x44, 0x61, 0x74,
+	0x61, 0x52, 0x65, 0x73, 0x70, 0x22, 0x00, 0x12, 0x7b, 0x0a, 0x1c, 0x4d, 0x61, 0x73, 0x74, 0x65,
+	0x72, 0x44, 0x61, 0x74, 0x61, 0x44, 0x65, 0x6c, 0x65, 0x74, 0x65, 0x42, 0x61, 0x63, 0x6b, 0x75,
+	0x70, 0x4f, 0x66, 0x44, 0x61, 0x74, 0x61, 0x12, 0x2b, 0x2e, 0x4d, 0x61, 0x73, 0x74, 0x65, 0x72,
+	0x44, 0x61, 0x74, 0x61, 0x2e, 0x4d, 0x61, 0x73, 0x74, 0x65, 0x72, 0x44, 0x61, 0x74, 0x61, 0x44,
+	0x65, 0x6c, 0x65, 0x74, 0x65, 0x42, 0x61, 0x63, 0x6b, 0x75, 0x70, 0x4f, 0x66, 0x44, 0x61, 0x74,
+	0x61, 0x52, 0x65, 0x71, 0x1a, 0x2c, 0x2e, 0x4d, 0x61, 0x73, 0x74, 0x65, 0x72, 0x44, 0x61, 0x74,
+	0x61, 0x2e, 0x4d, 0x61, 0x73, 0x74, 0x65, 0x72, 0x44, 0x61, 0x74, 0x61, 0x44, 0x65, 0x6c, 0x65,
+	0x74, 0x65, 0x42, 0x61, 0x63, 0x6b, 0x75, 0x70, 0x4f, 0x66, 0x44, 0x61, 0x74, 0x61, 0x52, 0x65,
+	0x73, 0x70, 0x22, 0x00, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
 var (
@@ -286,20 +506,28 @@ func file_proto_MasterData_MasterData_proto_rawDescGZIP() []byte {
 	return file_proto_MasterData_MasterData_proto_rawDescData
 }
 
-var file_proto_MasterData_MasterData_proto_msgTypes = make([]protoimpl.MessageInfo, 4)
+var file_proto_MasterData_MasterData_proto_msgTypes = make([]protoimpl.MessageInfo, 8)
 var file_proto_MasterData_MasterData_proto_goTypes = []interface{}{
-	(*MasterDataInformReshardReq)(nil),       // 0: MasterData.MasterDataInformReshardReq
-	(*MasterDataInformReshardResp)(nil),      // 1: MasterData.MasterDataInformReshardResp
-	(*MasterDataReshardDestinationReq)(nil),  // 2: MasterData.MasterDataReshardDestinationReq
-	(*MasterDataReshardDestinationResp)(nil), // 3: MasterData.MasterDataReshardDestinationResp
+	(*MasterDataInformReshardReq)(nil),         // 0: MasterData.MasterDataInformReshardReq
+	(*MasterDataInformReshardResp)(nil),        // 1: MasterData.MasterDataInformReshardResp
+	(*MasterDataReshardDestinationReq)(nil),    // 2: MasterData.MasterDataReshardDestinationReq
+	(*MasterDataReshardDestinationResp)(nil),   // 3: MasterData.MasterDataReshardDestinationResp
+	(*MasterDataRegisterBackupToDataReq)(nil),  // 4: MasterData.MasterDataRegisterBackupToDataReq
+	(*MasterDataRegisterBackupToDataResp)(nil), // 5: MasterData.MasterDataRegisterBackupToDataResp
+	(*MasterDataDeleteBackupOfDataReq)(nil),    // 6: MasterData.MasterDataDeleteBackupOfDataReq
+	(*MasterDataDeleteBackupOfDataResp)(nil),   // 7: MasterData.MasterDataDeleteBackupOfDataResp
 }
 var file_proto_MasterData_MasterData_proto_depIdxs = []int32{
 	0, // 0: MasterData.MasterData.MasterDataInformReshard:input_type -> MasterData.MasterDataInformReshardReq
 	2, // 1: MasterData.MasterData.MasterDataReshardDestination:input_type -> MasterData.MasterDataReshardDestinationReq
-	1, // 2: MasterData.MasterData.MasterDataInformReshard:output_type -> MasterData.MasterDataInformReshardResp
-	3, // 3: MasterData.MasterData.MasterDataReshardDestination:output_type -> MasterData.MasterDataReshardDestinationResp
-	2, // [2:4] is the sub-list for method output_type
-	0, // [0:2] is the sub-list for method input_type
+	4, // 2: MasterData.MasterData.MasterDataRegisterBackupToData:input_type -> MasterData.MasterDataRegisterBackupToDataReq
+	6, // 3: MasterData.MasterData.MasterDataDeleteBackupOfData:input_type -> MasterData.MasterDataDeleteBackupOfDataReq
+	1, // 4: MasterData.MasterData.MasterDataInformReshard:output_type -> MasterData.MasterDataInformReshardResp
+	3, // 5: MasterData.MasterData.MasterDataReshardDestination:output_type -> MasterData.MasterDataReshardDestinationResp
+	5, // 6: MasterData.MasterData.MasterDataRegisterBackupToData:output_type -> MasterData.MasterDataRegisterBackupToDataResp
+	7, // 7: MasterData.MasterData.MasterDataDeleteBackupOfData:output_type -> MasterData.MasterDataDeleteBackupOfDataResp
+	4, // [4:8] is the sub-list for method output_type
+	0, // [0:4] is the sub-list for method input_type
 	0, // [0:0] is the sub-list for extension type_name
 	0, // [0:0] is the sub-list for extension extendee
 	0, // [0:0] is the sub-list for field type_name
@@ -359,6 +587,54 @@ func file_proto_MasterData_MasterData_proto_init() {
 				return nil
 			}
 		}
+		file_proto_MasterData_MasterData_proto_msgTypes[4].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*MasterDataRegisterBackupToDataReq); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_proto_MasterData_MasterData_proto_msgTypes[5].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*MasterDataRegisterBackupToDataResp); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_proto_MasterData_MasterData_proto_msgTypes[6].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*MasterDataDeleteBackupOfDataReq); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_proto_MasterData_MasterData_proto_msgTypes[7].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*MasterDataDeleteBackupOfDataResp); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
@@ -366,7 +642,7 @@ func file_proto_MasterData_MasterData_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_proto_MasterData_MasterData_proto_rawDesc,
 			NumEnums:      0,
-			NumMessages:   4,
+			NumMessages:   8,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
@@ -395,6 +671,8 @@ type MasterDataClient interface {
 	// Sends a greeting
 	MasterDataInformReshard(ctx context.Context, in *MasterDataInformReshardReq, opts ...grpc.CallOption) (*MasterDataInformReshardResp, error)
 	MasterDataReshardDestination(ctx context.Context, in *MasterDataReshardDestinationReq, opts ...grpc.CallOption) (*MasterDataReshardDestinationResp, error)
+	MasterDataRegisterBackupToData(ctx context.Context, in *MasterDataRegisterBackupToDataReq, opts ...grpc.CallOption) (*MasterDataRegisterBackupToDataResp, error)
+	MasterDataDeleteBackupOfData(ctx context.Context, in *MasterDataDeleteBackupOfDataReq, opts ...grpc.CallOption) (*MasterDataDeleteBackupOfDataResp, error)
 }
 
 type masterDataClient struct {
@@ -423,11 +701,31 @@ func (c *masterDataClient) MasterDataReshardDestination(ctx context.Context, in 
 	return out, nil
 }
 
+func (c *masterDataClient) MasterDataRegisterBackupToData(ctx context.Context, in *MasterDataRegisterBackupToDataReq, opts ...grpc.CallOption) (*MasterDataRegisterBackupToDataResp, error) {
+	out := new(MasterDataRegisterBackupToDataResp)
+	err := c.cc.Invoke(ctx, "/MasterData.MasterData/MasterDataRegisterBackupToData", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *masterDataClient) MasterDataDeleteBackupOfData(ctx context.Context, in *MasterDataDeleteBackupOfDataReq, opts ...grpc.CallOption) (*MasterDataDeleteBackupOfDataResp, error) {
+	out := new(MasterDataDeleteBackupOfDataResp)
+	err := c.cc.Invoke(ctx, "/MasterData.MasterData/MasterDataDeleteBackupOfData", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // MasterDataServer is the server API for MasterData service.
 type MasterDataServer interface {
 	// Sends a greeting
 	MasterDataInformReshard(context.Context, *MasterDataInformReshardReq) (*MasterDataInformReshardResp, error)
 	MasterDataReshardDestination(context.Context, *MasterDataReshardDestinationReq) (*MasterDataReshardDestinationResp, error)
+	MasterDataRegisterBackupToData(context.Context, *MasterDataRegisterBackupToDataReq) (*MasterDataRegisterBackupToDataResp, error)
+	MasterDataDeleteBackupOfData(context.Context, *MasterDataDeleteBackupOfDataReq) (*MasterDataDeleteBackupOfDataResp, error)
 }
 
 // UnimplementedMasterDataServer can be embedded to have forward compatible implementations.
@@ -439,6 +737,12 @@ func (*UnimplementedMasterDataServer) MasterDataInformReshard(context.Context, *
 }
 func (*UnimplementedMasterDataServer) MasterDataReshardDestination(context.Context, *MasterDataReshardDestinationReq) (*MasterDataReshardDestinationResp, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method MasterDataReshardDestination not implemented")
+}
+func (*UnimplementedMasterDataServer) MasterDataRegisterBackupToData(context.Context, *MasterDataRegisterBackupToDataReq) (*MasterDataRegisterBackupToDataResp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method MasterDataRegisterBackupToData not implemented")
+}
+func (*UnimplementedMasterDataServer) MasterDataDeleteBackupOfData(context.Context, *MasterDataDeleteBackupOfDataReq) (*MasterDataDeleteBackupOfDataResp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method MasterDataDeleteBackupOfData not implemented")
 }
 
 func RegisterMasterDataServer(s *grpc.Server, srv MasterDataServer) {
@@ -481,6 +785,42 @@ func _MasterData_MasterDataReshardDestination_Handler(srv interface{}, ctx conte
 	return interceptor(ctx, in, info, handler)
 }
 
+func _MasterData_MasterDataRegisterBackupToData_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MasterDataRegisterBackupToDataReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MasterDataServer).MasterDataRegisterBackupToData(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/MasterData.MasterData/MasterDataRegisterBackupToData",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MasterDataServer).MasterDataRegisterBackupToData(ctx, req.(*MasterDataRegisterBackupToDataReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _MasterData_MasterDataDeleteBackupOfData_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MasterDataDeleteBackupOfDataReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MasterDataServer).MasterDataDeleteBackupOfData(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/MasterData.MasterData/MasterDataDeleteBackupOfData",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MasterDataServer).MasterDataDeleteBackupOfData(ctx, req.(*MasterDataDeleteBackupOfDataReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 var _MasterData_serviceDesc = grpc.ServiceDesc{
 	ServiceName: "MasterData.MasterData",
 	HandlerType: (*MasterDataServer)(nil),
@@ -492,6 +832,14 @@ var _MasterData_serviceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "MasterDataReshardDestination",
 			Handler:    _MasterData_MasterDataReshardDestination_Handler,
+		},
+		{
+			MethodName: "MasterDataRegisterBackupToData",
+			Handler:    _MasterData_MasterDataRegisterBackupToData_Handler,
+		},
+		{
+			MethodName: "MasterDataDeleteBackupOfData",
+			Handler:    _MasterData_MasterDataDeleteBackupOfData_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

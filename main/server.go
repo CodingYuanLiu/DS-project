@@ -81,6 +81,28 @@ func testMapByteConvert(){
 	fmt.Printf("Converted bytes:\n%v\n\n", bytes)
 	fmt.Printf("Converted map:\n%v\n\n", utils.ByteToKeyValueMap(bytes))
 }
+
+func continuousPrint(){
+	for{
+		fmt.Println("print...")
+		time.Sleep(time.Second)
+	}
+}
+func testNestedGoroutine(){
+	go continuousPrint()
+	fmt.Println("Function return")
+}
+
+func testZKExist(){
+	conn := ConnectZookeeper()
+	exist, _, err := conn.Exists("/path1231/zxc")
+	fmt.Println(exist)
+	fmt.Println(err)
+}
 func main(){
-	testMapByteConvert()
+	m := map[int] int{
+		2: 4,
+		3:9,
+	}
+	fmt.Println(len(m))
 }

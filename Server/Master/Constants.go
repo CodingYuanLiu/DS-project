@@ -11,4 +11,5 @@ const (
 	aliveResp = "Alive"
 	aliveReq = "Is alive?"
 	heartBeatTimeInterval = 2
+	messagePromote = "Promote"
 )

@@ -19,6 +19,9 @@ package DataData;
 //use to reshard the datas
 service DataData {
   rpc DataDataMigrate (DataDataMigrateReq) returns (DataDataMigrateResp) {}
+  rpc DataDataSyncAll (DataDataSyncAllReq) returns (DataDataSyncAllResp) {}
+  rpc DataDataSyncPut (DataDataSyncPutReq) returns (DataDataSyncPutResp) {}
+  rpc DataDataSyncDelete (DataDataSyncDeleteReq) returns (DataDataSyncDeleteResp) {}
 }
 
 message DataDataMigrateReq {
@@ -26,5 +29,30 @@ message DataDataMigrateReq {
 }
 
 message DataDataMigrateResp {
+  string Message = 1;
+}
+
+message DataDataSyncAllReq{
+  bytes KeyValues = 1;
+}
+
+message DataDataSyncAllResp {
+  string Message = 1;
+}
+
+message  DataDataSyncPutReq{
+  string Key = 1;
+  string Value = 2;
+}
+
+message DataDataSyncPutResp{
+  string Message = 1;
+}
+
+message DataDataSyncDeleteReq{
+  string Key = 1;
+}
+
+message DataDataSyncDeleteResp{
   string Message = 1;
 }

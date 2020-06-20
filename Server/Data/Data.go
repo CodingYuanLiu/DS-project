@@ -15,14 +15,7 @@ import (
 	"os"
 	"time"
 )
-const(
-	defaultDataPort = ":7777"
-	dataNodesPath   = "/DataNode" //The root node of the data nodes' ports
-	aliveResp       = "Alive"
-	aliveReq        = "Is alive?"
-	masterPort      = ":7000"
-	defaultIP       = "localhost"
-)
+
 
 func ConnectZookeeper() *zk.Conn{
 	hosts := []string{"localhost:2181", "localhost:2182", "localhost:2183"}
@@ -45,7 +38,7 @@ func ZkRegisterDataNodePort(conn *zk.Conn, port string) error{
  		return errors.New("the data node already exists in the zookeeper")
 	}
 
-	_, err = conn.Create(path, []byte("Alive"), 0, zk.WorldACL(zk.PermAll))
+	_, err = conn.Create(path, []byte(aliveResp), 0, zk.WorldACL(zk.PermAll))
 	if err != nil{
 		return err
 	}
@@ -77,18 +70,30 @@ func HeartBeatResponse(conn *zk.Conn, port string) error{
 		return err
 	}
 
+	if err := HeartBeatResponseLoop(conn, path); err != nil{
+		utils.Error("HeartBeatResponse error: %v\n", err)
+		return err
+	}
+	return nil
+}
+
+
+func HeartBeatResponseLoop(conn *zk.Conn, path string) error{
 	for {
-		_, s, getCh, err := conn.GetW(path)
+		info, s, getCh, err := conn.GetW(path)
 		if err != nil {
-			fmt.Printf("watch node error: %v\n", err)
+			utils.Error("watch node error: %v\n", err)
 			return err
 		}
-
+		if string(info[:]) == messagePromote{
+			log.Printf("Receive promote request from zookeeper")
+			return ErrMessagePromote
+		}
 		select {
 		case chEvent := <- getCh:
 			{
 				if chEvent.Type == zk.EventNodeDataChanged {
-					log.Printf("heart beat on port %v suceed\n", port)
+					log.Printf("heart beat on path %v suceed\n", path)
 					_, err := conn.Set(path, []byte(aliveResp), s.Version + 1)
 					if err != nil{
 						log.Printf("Error to set heart beat detection response: %v\n", err)
@@ -99,7 +104,8 @@ func HeartBeatResponse(conn *zk.Conn, port string) error{
 	}
 }
 
-func InitializeDataServer(lis net.Listener, port string){
+
+func InitializeDataServer(lis net.Listener, port string, dataServer *DataServer){
 	grpcServer := grpc.NewServer()
 	zkConn := ConnectZookeeper()
 
@@ -109,11 +115,6 @@ func InitializeDataServer(lis net.Listener, port string){
 	}
 
 	go HeartBeatResponse(zkConn, port)
-	dataServer := &DataServer{
-		database: map[string]string{},
-		//dataMasterCli: NewDataMasterCli(),
-		port: port,
-	}
 
 	//TEST
 	/*
@@ -141,12 +142,19 @@ func main() {
 	if len(os.Args) > 1 {
 		port = os.Args[1]
 	}
+	dataServer := &DataServer{
+		database: map[string]string{},
+		//dataMasterCli: NewDataMasterCli(),
+		port: port,
+		backupNodes: map[string] string{},
+	}
+
 	lis, err := net.Listen("tcp", port)
 	fmt.Printf("Data node listening port %v...\n", port)
 
 	if err != nil{
 		//TODO: err so register backup server
-		if err := InitializeBackupServer(port); err != nil{
+		if err := InitializeBackupServer(port, dataServer); err != nil{
 			utils.Error("Initialize backup server error: %v\n", err)
 			log.Fatal(err)
 		}
@@ -154,5 +162,5 @@ func main() {
 		log.Fatal(err)
 	}
 
-	InitializeDataServer(lis, port)
+	InitializeDataServer(lis, port, dataServer)
 }

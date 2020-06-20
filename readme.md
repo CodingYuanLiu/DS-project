@@ -45,7 +45,16 @@
   * 这个过程需要对port加写锁。如果有req先抢到锁，他们可能会失败返回error（或者更糟糕的是直接block住导致死锁）
   * 因此明天必须要先测试一下是会block还是会返回error
   
+* 实现了容错里面的backup node的服务注册及心跳检测功能
+  * BUG：如果一个data server挂了，那么在注册它的时候启动的watch backup node的goroutine不会挂，导致会有N个watcher在监听 backup 节点。这里面N-1个都是孤儿线程。
+    * 如果data 死了以后能够重启，似乎不会创建新的watcher所以不会有这个问题?
+    * 明天先检查一下有没有别的孤儿线程bug
+* 目前使用一个backupServer数据结构监听backup节点用来做sync的port。目前想的是，在InitializeBackupServer里面注册好backup server以后，
+  阻塞在一个channel里，如果通过zk收到了promote的message，那么就去要其他backupnode的port list，然后升级成data server
+  * 这里面也要注意有没有孤儿线程的问题 
   
+## Day7
+* 实现容错里面的sync 和 重启功能
 
 ## Notes
 * 注意一些不会自己清除的状态或者需要手动创建的状态:

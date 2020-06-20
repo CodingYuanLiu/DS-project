@@ -19,6 +19,7 @@ type DataServer struct{
 	dataDataPb.UnimplementedDataDataServer
 	port string
 	database map[string] string
+	backupNodes map [string] string //Use as a set
 	//dataMasterCli dataMasterPb.DataMasterClient
 }
 
@@ -28,6 +29,8 @@ func (dataServer *DataServer) ClientDataPut(ctx context.Context, req *clientData
 
 	log.Printf("put key: %v, value: %v\n", req.Key, req.Value)
 	log.Println(dataServer.database)
+
+	//TODO: Sync to backup nodes
 	return &clientDataPb.ClientDataPutResp{
 		Message: "[Data server]: put succeed",
 	}, nil
@@ -40,6 +43,7 @@ func (dataServer *DataServer) ClientDataRead(ctx context.Context, req *clientDat
 	}
 	utils.Debug("read key: %v, value: %v\n", req.Key, value)
 	utils.Debug("database now: %v\n", dataServer.database)
+	//TODO: Sync to backup nodes
 	return &clientDataPb.ClientDataReadResp{
 		Value: value,
 		Message: "[Data server]: read succeed",
@@ -54,6 +58,7 @@ func (dataServer *DataServer) ClientDataDelete(ctx context.Context, req *clientD
 	}
 	delete(dataServer.database, req.Key)
 
+	//TODO: Sync to backup nodes
 	return &clientDataPb.ClientDataDeleteResp{
 		Message: "[Data server]: delete succeed",
 	}, nil
@@ -73,7 +78,7 @@ func (dataServer *DataServer) MasterDataInformReshard(ctx context.Context, req *
 func (dataServer *DataServer) MasterDataReshardDestination(ctx context.Context, req *masterDataPb.MasterDataReshardDestinationReq) (*masterDataPb.MasterDataReshardDestinationResp, error){
 	mapDestination := utils.ByteToKeyValueMap(req.KeyDestination)
 	utils.Debug("Receive reshard instructions: %v\n", mapDestination)
-	//TODO: data migration
+
 	err := dataServer.doDataMigration(mapDestination)
 	if err != nil{
 		utils.Error("doDataMigration error in MasterDataReshardDestination: %v\n", err)
@@ -93,6 +98,49 @@ func (dataServer *DataServer) DataDataMigrate(ctx context.Context, req *dataData
 	}, nil
 }
 
+func (dataServer *DataServer) MasterDataRegisterBackupToData(ctx context.Context, req *masterDataPb.MasterDataRegisterBackupToDataReq) (*masterDataPb.MasterDataRegisterBackupToDataResp, error){
+	backupPort := req.BackupPort
+	utils.Debug("Register backup node on port: %s\n", backupPort)
+	dataServer.backupNodes[backupPort] = "true"
+	cli := NewDataDataCli(backupPort)
+	newCtx, cancel := context.WithTimeout(context.Background(), 5 * time.Second)
+	_, err := cli.DataDataSyncAll(newCtx, &dataDataPb.DataDataSyncAllReq{
+		KeyValues: utils.KeyValueMapToByte(dataServer.database),
+	})
+	if err != nil{
+		utils.Error("Sync database to %s error: %v\n", backupPort, err)
+		return &masterDataPb.MasterDataRegisterBackupToDataResp{
+			Message: "sync error",
+		}, err
+	}
+	defer cancel()
+	return &masterDataPb.MasterDataRegisterBackupToDataResp{
+		Message: "register ok",
+	}, err
+}
+
+func (dataServer *DataServer) MasterDataDeleteBackupOfData(ctx context.Context, req *masterDataPb.MasterDataDeleteBackupOfDataReq) (*masterDataPb.MasterDataDeleteBackupOfDataResp, error){
+	backupPort := req.BackupPort
+	utils.Debug("delete backup node on port: %s\n", backupPort)
+	delete(dataServer.backupNodes, backupPort)
+	return &masterDataPb.MasterDataDeleteBackupOfDataResp{
+		Message: "delete ok",
+	}, nil
+}
+
+func (backupServer *BackupServer) DataDataSyncAll(ctx context.Context, req *dataDataPb.DataDataSyncAllReq) (*dataDataPb.DataDataSyncAllResp, error){
+	keyValueMap := utils.ByteToKeyValueMap(req.KeyValues)
+
+	backupServer.database = keyValueMap
+
+	utils.Debug("Synced database: %v\n", backupServer.database)
+
+	return &dataDataPb.DataDataSyncAllResp{
+		Message: "Sync complete",
+	}, nil
+}
+
+
 func NewDataDataCli(port string) dataDataPb.DataDataClient{
 	dataAddress := fmt.Sprintf("%s%s", defaultIP, port)
 	conn, err := grpc.Dial(dataAddress, grpc.WithInsecure(), grpc.WithBlock())
@@ -106,6 +154,7 @@ func NewDataDataCli(port string) dataDataPb.DataDataClient{
 func (dataServer *DataServer) doDataMigration(mapDestination map[string] string) error {
 	migrateKeyValues := map[string] string{}
 	dest := ""
+	//TODO: Need to migrate to backup nodes????
 	for key, destPort := range mapDestination{
 		if destPort != dataServer.port{
 			migrateKeyValues[key] = dataServer.database[key]

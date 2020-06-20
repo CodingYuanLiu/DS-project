@@ -20,6 +20,8 @@ service MasterData {
   // Sends a greeting
   rpc MasterDataInformReshard (MasterDataInformReshardReq) returns (MasterDataInformReshardResp) {}
   rpc MasterDataReshardDestination (MasterDataReshardDestinationReq) returns (MasterDataReshardDestinationResp) {}
+  rpc MasterDataRegisterBackupToData (MasterDataRegisterBackupToDataReq) returns (MasterDataRegisterBackupToDataResp) {}
+  rpc MasterDataDeleteBackupOfData (MasterDataDeleteBackupOfDataReq) returns (MasterDataDeleteBackupOfDataResp) {}
 }
 
 // The request message containing the user's name.
@@ -38,5 +40,21 @@ message MasterDataReshardDestinationReq {
 
 // The response message containing the greetings
 message MasterDataReshardDestinationResp {
+  string Message = 1;
+}
+
+message MasterDataRegisterBackupToDataReq{
+  string BackupPort = 1;
+}
+
+message MasterDataRegisterBackupToDataResp{
+  string Message = 1;
+}
+
+message MasterDataDeleteBackupOfDataReq{
+  string BackupPort = 1;
+}
+
+message MasterDataDeleteBackupOfDataResp{
   string Message = 1;
 }

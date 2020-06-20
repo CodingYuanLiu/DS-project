@@ -51,8 +51,8 @@ func ConnectZookeeper() *zk.Conn{
 	return zkConn
 }
 
-func (master *Master) WatchNewDataNode(conn *zk.Conn, path string) error{
-	err := master.dataNodeManager.WatchNewDataNode(conn, path)
+func (master *Master) WatchNewDataNode(path string) error{
+	err := master.dataNodeManager.WatchNewDataNode(path)
 	if err != nil{
 		log.Printf("Master: watch new node error: %v\n", err)
 		return err
@@ -84,7 +84,7 @@ func main(){
 		dataNodeManager: dataNodeManager,
 	}
 
-	go masterServer.WatchNewDataNode(zkConn, dataNodesPath)
+	go masterServer.WatchNewDataNode(dataNodesPath)
 
 	s := grpc.NewServer()
 	clientMasterPb.RegisterClientMasterServer(s, &masterServer)
