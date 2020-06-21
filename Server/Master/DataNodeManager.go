@@ -78,11 +78,22 @@ func (dataNodeManager DataNodeManager)DeleteDataNode(port string) error{
 	delete(dataNodeManager.dataNodesSet, port)
 	dataNodeManager.hashRing.RemoveNode(port)
 	dataNodeManager.nodeNum -= 1
+
+	//Delete the znode to reform the BackupNodeWatcher to return (recycle the orphan goroutine)
+	err := dataNodeManager.backupNodeManager.DeleteBackupRoot(port)
+	if err != nil{
+		utils.Error("Delete backup root in DeleteDataNode error: %v\n", err)
+		return err
+	}
+
 	//TODO: do the migration (backup deployment)
 	//TODO: unlock
 
 	return nil
 }
+
+
+
 
 func (dataNodeManager DataNodeManager)RegisterDataNode(port string) error{
 	err := dataNodeManager.globalRwLock.LockWriter()
@@ -102,6 +113,7 @@ func (dataNodeManager DataNodeManager)RegisterDataNode(port string) error{
 
 	//Initialization about backup
 	//dataNodeManager.InitializeBackupZnode(port)
+	dataNodeManager.backupNodeManager.backupNodeSet[port] = map[string] *BackupNode{}
 	go dataNodeManager.backupNodeManager.WatchNewBackupNodes(port)
 
 	go dataNodeManager.HeartBeatDetection(port)
@@ -188,15 +200,32 @@ func (dataNodeManager DataNodeManager)HeartBeatDetection(port string) error{
 				dataNodeManager.dataNodesSet[port].heartBeatFailures += 1
 				log.Printf("data node on port %v failed %d times, node value: %v\n", port, dataNodeManager.dataNodesSet[port].heartBeatFailures, string(value[:]))
 			} else{
-				log.Printf("data node on port %v utterly failed, delete it\n", port)
-				_ = dataNodeManager.DeleteDataNode(port)
-				//Delete the zk node
-				if err := dataNodeManager.conn.Delete(nodePath, s.Version); err != nil{
+				log.Printf("data node on port %v failed, try to promote a backup node\n", port)
+				err := dataNodeManager.backupNodeManager.PromoteBackupToData(port)
+				if err == ErrNoBackup{
+					log.Printf("data node on port %v utterly failed (no backups), delete it\n", port)
+					_ = dataNodeManager.DeleteDataNode(port)
+					//Delete the zk node
+					if err := dataNodeManager.conn.Delete(nodePath, s.Version); err != nil{
+						return err
+					}
+					break
+				} else if err != nil{
+					utils.Error("Promote backup node error: %v\n", err)
 					return err
 				}
-				break
+
+				//Promote complete, continue next loop of heartbeat detection
+				dataNodeManager.dataNodesSet[port].heartBeatFailures = 0
+				_, err = dataNodeManager.conn.Set(nodePath, []byte(aliveReq),s.Version)
+				if err != nil{
+					utils.Error("heart beat detection: set node error: %v\n", err)
+					return err
+				}
+				continue
 			}
 		} else{
+			dataNodeManager.dataNodesSet[port].heartBeatFailures = 0
 			_, err := dataNodeManager.conn.Set(nodePath, []byte(aliveReq),s.Version)
 			if err != nil{
 				utils.Error("heart beat detection: set node error: %v\n", err)

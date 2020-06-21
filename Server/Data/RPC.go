@@ -10,6 +10,7 @@ import (
 	"fmt"
 	"google.golang.org/grpc"
 	"log"
+	"net"
 	"time"
 )
 
@@ -30,10 +31,31 @@ func (dataServer *DataServer) ClientDataPut(ctx context.Context, req *clientData
 	log.Printf("put key: %v, value: %v\n", req.Key, req.Value)
 	log.Println(dataServer.database)
 
-	//TODO: Sync to backup nodes
+	err := SyncBackupPut(dataServer.backupNodes, req.Key, req.Value)
+	if err != nil{
+		utils.Error("SyncBackupPut in ClientDataPut error: %v\n", err)
+		return nil, err
+	}
 	return &clientDataPb.ClientDataPutResp{
 		Message: "[Data server]: put succeed",
 	}, nil
+}
+
+func SyncBackupPut(backupNodes map[string] string, key string, value string) error{
+	for backupNode, _ := range backupNodes{
+		cli := NewDataDataCli(backupNode)
+		ctx, cancel := context.WithTimeout(context.Background(), 5 * time.Second)
+		_, err := cli.DataDataSyncPut(ctx, &dataDataPb.DataDataSyncPutReq{
+			Key: key,
+			Value: value,
+		})
+		if err != nil{
+			utils.Error("Sync backup node %s in SyncBackupPut error: %v\n", backupNode, err)
+			return err
+		}
+		cancel()
+	}
+	return nil
 }
 
 func (dataServer *DataServer) ClientDataRead(ctx context.Context, req *clientDataPb.ClientDataReadReq) (*clientDataPb.ClientDataReadResp, error){
@@ -42,8 +64,8 @@ func (dataServer *DataServer) ClientDataRead(ctx context.Context, req *clientDat
 		return nil, errors.New("no value in the database")
 	}
 	utils.Debug("read key: %v, value: %v\n", req.Key, value)
-	utils.Debug("database now: %v\n", dataServer.database)
-	//TODO: Sync to backup nodes
+	utils.Debug("database in ClientDataRead: %v\n", dataServer.database)
+	//No need to sync to backup nodes
 	return &clientDataPb.ClientDataReadResp{
 		Value: value,
 		Message: "[Data server]: read succeed",
@@ -58,11 +80,30 @@ func (dataServer *DataServer) ClientDataDelete(ctx context.Context, req *clientD
 	}
 	delete(dataServer.database, req.Key)
 
-	//TODO: Sync to backup nodes
+	err := SyncBackupDelete(dataServer.backupNodes, req.Key)
+	if err != nil{
+		utils.Error("SyncBackupDelete in ClientDataDelete error: %v\n", err)
+	}
 	return &clientDataPb.ClientDataDeleteResp{
 		Message: "[Data server]: delete succeed",
 	}, nil
 
+}
+
+func SyncBackupDelete(backupNodes map[string] string, key string) error{
+	for backupNode, _ := range backupNodes{
+		cli := NewDataDataCli(backupNode)
+		ctx, cancel := context.WithTimeout(context.Background(), 5 * time.Second)
+		_, err := cli.DataDataSyncDelete(ctx, &dataDataPb.DataDataSyncDeleteReq{
+			Key: key,
+		})
+		if err != nil{
+			utils.Error("Sync backup node %s in SyncBackupDelete error: %v\n", backupNode, err)
+			return err
+		}
+		cancel()
+	}
+	return nil
 }
 
 func (dataServer *DataServer) MasterDataInformReshard(ctx context.Context, req *masterDataPb.MasterDataInformReshardReq) (*masterDataPb.MasterDataInformReshardResp, error){
@@ -100,7 +141,7 @@ func (dataServer *DataServer) DataDataMigrate(ctx context.Context, req *dataData
 
 func (dataServer *DataServer) MasterDataRegisterBackupToData(ctx context.Context, req *masterDataPb.MasterDataRegisterBackupToDataReq) (*masterDataPb.MasterDataRegisterBackupToDataResp, error){
 	backupPort := req.BackupPort
-	utils.Debug("Register backup node on port: %s\n", backupPort)
+	log.Printf("Register backup node on port: %s\n", backupPort)
 	dataServer.backupNodes[backupPort] = "true"
 	cli := NewDataDataCli(backupPort)
 	newCtx, cancel := context.WithTimeout(context.Background(), 5 * time.Second)
@@ -121,7 +162,7 @@ func (dataServer *DataServer) MasterDataRegisterBackupToData(ctx context.Context
 
 func (dataServer *DataServer) MasterDataDeleteBackupOfData(ctx context.Context, req *masterDataPb.MasterDataDeleteBackupOfDataReq) (*masterDataPb.MasterDataDeleteBackupOfDataResp, error){
 	backupPort := req.BackupPort
-	utils.Debug("delete backup node on port: %s\n", backupPort)
+	log.Printf("delete backup node on port: %s\n", backupPort)
 	delete(dataServer.backupNodes, backupPort)
 	return &masterDataPb.MasterDataDeleteBackupOfDataResp{
 		Message: "delete ok",
@@ -140,6 +181,21 @@ func (backupServer *BackupServer) DataDataSyncAll(ctx context.Context, req *data
 	}, nil
 }
 
+func (backupServer *BackupServer) DataDataSyncPut(ctx context.Context, req *dataDataPb.DataDataSyncPutReq) (*dataDataPb.DataDataSyncPutResp, error) {
+	backupServer.database[req.Key] = req.Value
+	utils.Debug("database after sync put: %v\n", backupServer.database)
+	return &dataDataPb.DataDataSyncPutResp{
+		Message: "sync put: ok",
+	}, nil
+}
+
+func (backupServer *BackupServer) DataDataSyncDelete(ctx context.Context, req *dataDataPb.DataDataSyncDeleteReq) (*dataDataPb.DataDataSyncDeleteResp, error){
+	delete(backupServer.database, req.Key)
+	utils.Debug("database after sync delete: %v\n", backupServer.database)
+	return &dataDataPb.DataDataSyncDeleteResp{
+		Message: "sync delete: ok",
+	}, nil
+}
 
 func NewDataDataCli(port string) dataDataPb.DataDataClient{
 	dataAddress := fmt.Sprintf("%s%s", defaultIP, port)
@@ -154,7 +210,7 @@ func NewDataDataCli(port string) dataDataPb.DataDataClient{
 func (dataServer *DataServer) doDataMigration(mapDestination map[string] string) error {
 	migrateKeyValues := map[string] string{}
 	dest := ""
-	//TODO: Need to migrate to backup nodes????
+
 	for key, destPort := range mapDestination{
 		if destPort != dataServer.port{
 			migrateKeyValues[key] = dataServer.database[key]
@@ -167,6 +223,7 @@ func (dataServer *DataServer) doDataMigration(mapDestination map[string] string)
 
 		}
 	}
+
 	//Need to migrate
 	if dest != ""{
 		cli := NewDataDataCli(dest)
@@ -181,8 +238,80 @@ func (dataServer *DataServer) doDataMigration(mapDestination map[string] string)
 		}
 		for migrateKey,_ := range migrateKeyValues{
 			delete(dataServer.database, migrateKey)
+			err := SyncBackupDelete(dataServer.backupNodes, migrateKey)
+			if err != nil{
+				utils.Error("Delete the data on backup nodes in doDataMigration error: %v\n", err)
+				return err
+			}
 		}
 		utils.Debug("Migrate data succeed, rpc response: %v\n", resp.Message)
 	}
 	return nil
+}
+
+
+//Promote the backup server as a rpc service.
+//It initialize the dataserver, continue the heart beat detection, and delete the znode to stop the previous heart beat detection
+//However, the previous grpc server(backup server) is not stopped. But as its port has been deleted from the backupNodeManager,
+//there will be no request to the backup server.
+func (backupServer *BackupServer) MasterBackupInformPromotion (ctx context.Context, req *masterDataPb.MasterBackupInformPromotionReq) (*masterDataPb.MasterBackupInformPromotionResp, error){
+	log.Println("Try to promote to data server...")
+	backupNodesList := utils.ByteToStringArray(req.BackupNodes)
+	backupNodesSet := map[string] string{}
+	for _, backupNode := range backupNodesList{
+		if backupNode == "" { //Go feature: empty backupNodesList still have a length 1 with a "" string
+			continue
+		}
+		backupNodesSet[backupNode] = "true"
+	}
+
+	utils.Debug("promoted data node's backup nodes: %v\n", backupNodesSet)
+	dataServer := &DataServer{
+		port: backupServer.dataPort,
+		database: backupServer.database,
+		backupNodes: backupNodesSet,
+	}
+
+	//continue the heartbeat response
+	zkConn := ConnectZookeeper()
+	go HeartBeatResponse(zkConn, backupServer.dataPort)
+
+
+	//delete the backup's znode
+	backupPath := fmt.Sprintf("%s/%s/%s", backupNodesPath, backupServer.dataPort, backupServer.backupPort)
+	exist, s, err := zkConn.Exists(backupPath)
+	if err != nil{
+		utils.Error("Check the existence of the backup's znode error: %v\n", err)
+		return nil, err
+	} else if !exist{
+		utils.Error("The znode of path %s is already deleted\n", backupPath)
+		return nil, errors.New("the znode of the promoted backup server is already deleted")
+	}
+	err = zkConn.Delete(backupPath, s.Version)
+	if err != nil{
+		utils.Error("Can not delete the znode on path %s of the backup server: %v", backupPath, err)
+		return nil, err
+	}
+
+	//Initialize dataServer rpc
+	go func(dataPort string) error{
+		lis, err := net.Listen("tcp", backupServer.dataPort)
+		if err != nil{
+			utils.Error("Backup server can not listen the data server port %s: %v\n", backupServer.dataPort, err)
+			return err
+		}
+		grpcServer := grpc.NewServer()
+		clientDataPb.RegisterClientDataServer(grpcServer, dataServer)
+		masterDataPb.RegisterMasterDataServer(grpcServer, dataServer)
+		dataDataPb.RegisterDataDataServer(grpcServer, dataServer)
+		log.Println("Now serve as a data server")
+		if err = grpcServer.Serve(lis); err != nil{
+			utils.Error("Can not serve the listener on port %s: %v\n", dataPort, err)
+			return err
+		}
+		return nil
+	}(backupServer.dataPort)
+	return &masterDataPb.MasterBackupInformPromotionResp{
+		Message: "promote: ok",
+	}, nil
 }

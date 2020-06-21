@@ -46,10 +46,10 @@ func TestConcurrentClient(t *testing.T){
 func TestScalability(t *testing.T){
 	//The intended test sequence: testClient(), new node register, testScalability
 	cli := NewClient()
-	if value, err := cli.Read("testkey2"); err != nil || value != "value2" && value != "value2.2"{
+	if value, err := cli.Read("testkey1"); err != nil || value != "value1" && value != "value2.2"{
 		t.Error(err)
 	}
-	if value, err := cli.Read("testkey2"); err != nil || value != "value2" && value != "value2.2"{
+	if err := cli.Put("testkey2", "value2"); err != nil{
 		t.Error(err)
 	}
 }

@@ -40,9 +40,9 @@ func NewBackupNodeManager(conn *zk.Conn) (*BackupNodeManager,error){
 }
 
 //create and watch /BackupNode/$port to register new backup nodes
-func (backupNodeManager *BackupNodeManager) WatchNewBackupNodes(port string) error{
-	utils.Debug("Watch backup node of %s via zookeeper\n", port)
-	backupRootPortPath := fmt.Sprintf("%s/%s", backupNodesPath, port)
+func (backupNodeManager *BackupNodeManager) WatchNewBackupNodes(dataPort string) error{
+	utils.Debug("Watch backup node of %s via zookeeper\n", dataPort)
+	backupRootPortPath := fmt.Sprintf("%s/%s", backupNodesPath, dataPort)
 	conn := backupNodeManager.conn
 	exist, _, err := conn.Exists(backupRootPortPath)
 	if err != nil{
@@ -58,18 +58,25 @@ func (backupNodeManager *BackupNodeManager) WatchNewBackupNodes(port string) err
 	for{
 		_, _, getCh, err := conn.ChildrenW(backupRootPortPath)
 		if err != nil {
+			if err == zk.ErrNoNode{
+				//Delete the orphan goroutine
+				utils.Debug("can not watch children, recycle the orphan goroutine")
+				return nil
+			}
 			utils.Error("watch children error: %v\n", err)
+			return err
 		}
+
 		select {
 		case chEvent := <- getCh:
 			{
 				if chEvent.Type == zk.EventNodeChildrenChanged {
-					utils.Debug("detect backup node of %s changed on zookeeper\n", port)
+					utils.Debug("detect backup node of %s changed on zookeeper\n", dataPort)
 					backupNodes , _, err := conn.Children(backupRootPortPath)
 					if err != nil{
 						return err
 					}
-					if err := backupNodeManager.HandleBackupNodesChanges(backupNodes, port); err != nil{
+					if err := backupNodeManager.HandleBackupNodesChanges(backupNodes, dataPort); err != nil{
 						log.Printf("Handle data nodes change error: %v\n", err)
 					}
 				} else{
@@ -78,6 +85,35 @@ func (backupNodeManager *BackupNodeManager) WatchNewBackupNodes(port string) err
 			}
 		}
 	}
+}
+
+//Delete the dataNode information in backupNodeManager or zookeeper when there're no backups
+func (backupNodeManager *BackupNodeManager) DeleteBackupRoot(dataPort string) error{
+	if len(backupNodeManager.backupNodeSet[dataPort]) != 0{
+		utils.Error("There still exists backup nodes for data server %s, should not delete the backup root")
+		return errors.New("still exists backup nodes for data server, should not delete the backup root")
+	}
+	delete(backupNodeManager.backupNodeSet, dataPort)
+
+	//Delete the znode
+	backupRootPortPath := fmt.Sprintf("%s/%s", backupNodesPath, dataPort)
+	conn := backupNodeManager.conn
+	exist, s, err := conn.Exists(backupRootPortPath)
+	if err != nil{
+		utils.Error("check znode on backupRootPortPath %s in WatchNewBackupNodes err: %v\n", backupRootPortPath, err)
+		return err
+	} else if !exist{
+		utils.Error("backup root znode %s is already deleted\n", backupRootPortPath)
+		return errors.New("backup root znode is already deleted")
+	}
+
+	err = backupNodeManager.conn.Delete(backupRootPortPath, s.Version)
+	if err != nil{
+		utils.Error("Delete backup root node: %s error: %v\n", backupRootPortPath, err)
+		return err
+	}
+
+	return nil
 }
 
 func (backupNodeManager *BackupNodeManager) HandleBackupNodesChanges(backupPorts []string, dataPort string) error{
@@ -155,6 +191,7 @@ func registerBackupToData(backupPort string, dataPort string) error{
 	return nil
 }
 
+
 func deleteBackupOfData(backupPort string, dataPort string) error{
 	cli := GetDataCli(dataPort)
 	utils.Debug("Inform data node %s to delete %s\n", dataPort, backupPort)
@@ -167,7 +204,7 @@ func deleteBackupOfData(backupPort string, dataPort string) error{
 		utils.Error("Delete backup node of the data node via rpc error: %v\n", err)
 		return err
 	}
-	utils.Debug("Delete rpc result %s\n", resp.Message)
+	utils.Debug("Delete backup node of data %s, rpc result: %s\n", dataPort, resp.Message)
 	return nil
 }
 func (backupNodeManager *BackupNodeManager) DeleteBackupNode(backupPort string, dataPort string) error{
@@ -199,14 +236,19 @@ func (backupNodeManager *BackupNodeManager) HeartBeatDetection(backupPort string
 	backupNodeSetOfPort := backupNodeManager.backupNodeSet[dataPort]
 	for{
 		value, s, err := conn.Get(nodePath)
-		if err != nil{
+		//The node is deleted by the backup node itself
+		if err == zk.ErrNoNode{
+			utils.Debug("The backup node %s/%s is promoted", dataPort, backupPort)
+			return nil
+		} else if err != nil{
 			utils.Error("Get znode in HeartBeatDetection error: %v", err)
 			return err
 		}
+
 		if string(value[:]) != aliveResp{
 			if backupNodeSetOfPort[backupPort].heartBeatFailures < heartBeatDetectionFailureBound - 1{
 				backupNodeSetOfPort[backupPort].heartBeatFailures += 1
-				log.Printf("data node on port %s/%s failed %d times",
+				log.Printf("backup node on port %s/%s failed %d times",
 					dataPort, backupPort, backupNodeSetOfPort[backupPort].heartBeatFailures)
 			} else{
 				log.Printf("data node on port %s/%s utterly failed, delete it\n", dataPort, backupPort)
@@ -218,6 +260,12 @@ func (backupNodeManager *BackupNodeManager) HeartBeatDetection(backupPort string
 				break
 			}
 		} else{
+			backupNode := backupNodeSetOfPort[backupPort]
+			if backupNode == nil{
+				utils.Debug("The backup node %s/%s is promoted", dataPort, backupPort)
+				return nil
+			}
+			backupNodeSetOfPort[backupPort].heartBeatFailures = 0
 			_, err := conn.Set(nodePath, []byte(aliveReq), s.Version)
 			if err != nil{
 				utils.Error("heart beat detection: set node error: %v\n", err)
@@ -231,3 +279,49 @@ func (backupNodeManager *BackupNodeManager) HeartBeatDetection(backupPort string
 
 
 //TODO: inform the backup data to "promote", and delete the corresponding znode at zookeeper
+func (backupNodeManager *BackupNodeManager) PromoteBackupToData(dataPort string) error{
+	backupNodes := backupNodeManager.backupNodeSet[dataPort]
+	if len(backupNodes) == 0{
+		return ErrNoBackup
+	}
+	//TODO: select a port
+	var selectedBackupPort string
+	for backupNode, _ := range backupNodes{
+		selectedBackupPort = backupNode
+		break
+	}
+	//TODO: delete the port of the promoting backup in the backupNodeSet
+	delete(backupNodes, selectedBackupPort)
+	//Caution: the znode of the promoting backup is deleted by itself
+
+	//TODO: Inform the backup node on the port to promote
+	/*
+	zkConn := backupNodeManager.conn
+	path := fmt.Sprintf("%s/%s/%s", backupNodesPath, dataPort, selectedBackupPort)
+	exist, s, err := zkConn.Exists(path)
+	if err != nil{
+		utils.Error("check the existence of selected backup's znode error: %v\n", err)
+		return err
+	}
+	if !exist{
+		utils.Error("the selected backup's znode does not exist in zookeeper")
+		return errors.New("selected backup's znode does not exist")
+	}
+	*/
+	var backupNodesSyncList []string
+	for backupNode, _ := range backupNodes{
+		backupNodesSyncList = append(backupNodesSyncList, backupNode)
+	}
+
+	cli := GetDataCli(selectedBackupPort)
+	ctx, cancel := context.WithTimeout(context.Background(), 5 * time.Second)
+	defer cancel()
+	_, err := cli.MasterBackupInformPromotion(ctx, &masterDataPb.MasterBackupInformPromotionReq{
+		BackupNodes: utils.StringArrayToByte(backupNodesSyncList),
+	})
+	if err != nil{
+		utils.Error("MasterBackupInformPromotion in PromoteBackupToData error: %v", err)
+	}
+
+	return nil
+}

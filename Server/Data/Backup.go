@@ -2,6 +2,7 @@ package main
 
 import (
 	dataDataPb "FinalProject/proto/DataData"
+	masterDataPb "FinalProject/proto/MasterData"
 	"FinalProject/utils"
 	"errors"
 	"fmt"
@@ -13,7 +14,9 @@ import (
 
 type BackupServer struct{
 	dataDataPb.UnimplementedDataDataServer
-	port string
+	masterDataPb.UnimplementedMasterDataServer
+	dataPort string
+	backupPort string
 	database map[string] string
 	backupNodes map[string] string
 }
@@ -42,9 +45,9 @@ func BackupHeartBeatResponse(conn *zk.Conn, dataPort string, backupPort string) 
 	}
 
 	if err := HeartBeatResponseLoop(conn, path); err != nil{
-		if err == ErrMessagePromote{
-			log.Printf("Try to promote to data server %s\n", dataPort)
-			//TODO: Promote from a backup server to a data server
+		if err == zk.ErrNoNode{
+			utils.Debug("The backup node %s is likely to promote and delete the znode\n", path)
+			return nil
 		} else{
 			utils.Error("HeartBeatResponse error: %v\n", err)
 			return err
@@ -54,7 +57,7 @@ func BackupHeartBeatResponse(conn *zk.Conn, dataPort string, backupPort string) 
 }
 
 //The function will normally blocked, as a backup server or finally serve as a data server
-func InitializeBackupServer(dataPort string, dataServer *DataServer) error{
+func InitializeBackupServer(dataPort string) error{
 	backupPortInt, err := GetFreePort()
 	if err != nil{
 		utils.Error("Get free port error: %v\n", err)
@@ -65,7 +68,8 @@ func InitializeBackupServer(dataPort string, dataServer *DataServer) error{
 
 	//TODO: It keeps synchronization with the data server in the dead loop
 	backupServer := &BackupServer{
-		port: dataPort,
+		dataPort: dataPort,
+		backupPort: backupPort,
 		database: map[string] string{},
 		backupNodes: map[string] string{},
 	}
@@ -125,7 +129,10 @@ func RegisterSyncServer(backupPort string, backupServer *BackupServer){
 	}
 
 	dataDataPb.RegisterDataDataServer(grpcServer, backupServer)
+	masterDataPb.RegisterMasterDataServer(grpcServer, backupServer)
+
 	if err = grpcServer.Serve(lis); err != nil{
 		log.Fatal(err)
 	}
 }
+

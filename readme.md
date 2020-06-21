@@ -55,6 +55,20 @@
   
 ## Day7
 * 实现容错里面的sync 和 重启功能
+* master通过rpc告诉backup server需要promote，并且在参数里面告诉backup server他现在还有哪些backup节点
+  * backup server直接在rpc处理里面，创建新的dataServer节点（database，注册dataServer rpc，并且通过goroutine去监听rpc的端口以及在原先data node的节点上面做心跳检测）
+  * 同时，backup server把之前backup节点删掉，这样master在心跳检测的时候就知道backup server已经在promote了，就停掉对该backup server的心跳检测。同样，backup server的心跳检测response goroutine也能察觉到节点被删掉然后停掉。
+    * （这里通过删节点传信息鲁棒性可能不太好？）
+  * backup server保留了之前做backup server的时候listen的rpc节点端口（主要是不知道怎么关），但是因为backupNodemanager里面选择了这个backup server 来promote之后，就把这个port给删掉了，因此没有人知道这个backup server的port，从而这个port再也不会被访问到了。
+* 通过了初步的测试：和之前相同的scalability，以及data server挂了以后backup server晋升为data server，仍然能read到之前的请求。
+
+## Day8 收尾
+* 创建一些不会自己荆楚或者需要手动创建的zookeeper状态
+* 把log完善一下。有些log被写道utils.Debug里面去了。
+* 补充一些额外的测试
+  * 需要补充和优化的测试：并发测试，scalability测试，availability测试（这个不能像scalability一样实时）
+* 写文档
+* 可能需要自己抄一下zookeeper的dockerfile自己起一下zookeeper
 
 ## Notes
 * 注意一些不会自己清除的状态或者需要手动创建的状态:
@@ -63,3 +77,7 @@
     3. /locks/$port里面存着用来加锁的节点。不过这个正常情况下会自行消除。
     4. /globalLock
     5. /readers/global
+    
+    
+    
+HeartBeatFailure => 删datanodeset，删data节点和backup节点 => datawatch注意到，但是旧的和新的一样所以没反应。

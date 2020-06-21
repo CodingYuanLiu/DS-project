@@ -22,6 +22,7 @@ service MasterData {
   rpc MasterDataReshardDestination (MasterDataReshardDestinationReq) returns (MasterDataReshardDestinationResp) {}
   rpc MasterDataRegisterBackupToData (MasterDataRegisterBackupToDataReq) returns (MasterDataRegisterBackupToDataResp) {}
   rpc MasterDataDeleteBackupOfData (MasterDataDeleteBackupOfDataReq) returns (MasterDataDeleteBackupOfDataResp) {}
+  rpc MasterBackupInformPromotion (MasterBackupInformPromotionReq) returns (MasterBackupInformPromotionResp){}
 }
 
 // The request message containing the user's name.
@@ -56,5 +57,13 @@ message MasterDataDeleteBackupOfDataReq{
 }
 
 message MasterDataDeleteBackupOfDataResp{
+  string Message = 1;
+}
+
+message MasterBackupInformPromotionReq{
+  bytes BackupNodes = 1; //sync the backup nodes of the failed data node
+}
+
+message MasterBackupInformPromotionResp{
   string Message = 1;
 }
