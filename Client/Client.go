@@ -212,7 +212,7 @@ func (cli *Client) GetRwLock(port string) lock.RwLock{
 }
 
 /*
-func main() {
+func Try() {
 	cli := NewClient()
 	if err := cli.Put("1", "value1"); err != nil{
 		log.Fatal(err)

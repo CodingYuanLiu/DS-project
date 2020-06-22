@@ -74,7 +74,6 @@ func NewDataNodeManager(conn *zk.Conn) (*DataNodeManager, error){
 }
 
 func (dataNodeManager DataNodeManager)DeleteDataNode(port string) error{
-	//TODO: lock the master node and data node when deletion is undone
 	delete(dataNodeManager.dataNodesSet, port)
 	dataNodeManager.hashRing.RemoveNode(port)
 	dataNodeManager.nodeNum -= 1
@@ -85,10 +84,6 @@ func (dataNodeManager DataNodeManager)DeleteDataNode(port string) error{
 		utils.Error("Delete backup root in DeleteDataNode error: %v\n", err)
 		return err
 	}
-
-	//TODO: do the migration (backup deployment)
-	//TODO: unlock
-
 	return nil
 }
 
@@ -112,7 +107,6 @@ func (dataNodeManager DataNodeManager)RegisterDataNode(port string) error{
 	dataNodeManager.dataNodesSet[port] = NewDataNode(port)
 
 	//Initialization about backup
-	//dataNodeManager.InitializeBackupZnode(port)
 	dataNodeManager.backupNodeManager.backupNodeSet[port] = map[string] *BackupNode{}
 	go dataNodeManager.backupNodeManager.WatchNewBackupNodes(port)
 
@@ -125,26 +119,6 @@ func (dataNodeManager DataNodeManager)RegisterDataNode(port string) error{
 	return nil
 }
 
-func (dataNodeManager *DataNodeManager)InitializeBackupZnode(port string) error{
-	path := fmt.Sprintf("%s/%s", backupNodesPath, port)
-	exist, _, err := dataNodeManager.conn.Exists(path)
-	if exist{
-		utils.Debug("Backup root node of port %s is already created\n", port)
-		return nil
-	} else if err != nil && err != zk.ErrNoNode{
-		utils.Error("Check backup root node of port %s existence error: %v\n", port, err)
-		return err
-	}
-	_, err = dataNodeManager.conn.Create(path, []byte{}, zk.FlagEphemeral, zk.WorldACL(zk.PermAll))
-	if err != nil{
-		utils.Error("Can not create backup root node of port %s: %v ", port, err)
-		return err
-	}
-
-	//TODO: Watch the node to register new backup nodes
-
-	return nil
-}
 func (dataNodeManager DataNodeManager)DataReshard() error{
 	for _, dataNode := range dataNodeManager.dataNodesSet{
 		ctx, cancel := context.WithTimeout(context.Background(), 5 * time.Second)

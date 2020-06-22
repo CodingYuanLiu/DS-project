@@ -66,7 +66,6 @@ func InitializeBackupServer(dataPort string) error{
 	backupPort := fmt.Sprintf(":%d", backupPortInt)
 	log.Printf("Initialize backup server of %s on port %s...\n", dataPort, backupPort)
 
-	//TODO: It keeps synchronization with the data server in the dead loop
 	backupServer := &BackupServer{
 		dataPort: dataPort,
 		backupPort: backupPort,
@@ -85,11 +84,6 @@ func InitializeBackupServer(dataPort string) error{
 
 	//Watch the znode in a dead loop, response for heart beat detection, until master set the special flag on the znode
 	go BackupHeartBeatResponse(zkConn, dataPort, backupPort)
-
-
-	//TODO: Initialize as a data server if it breaks from the dead loop.
-	//TODO: Don't forget the delete the corresponding znode from the zookeeper
-	//TODO: Serve as a data server and blocked
 
 	for{
 		;

@@ -21,15 +21,14 @@ type DataServer struct{
 	port string
 	database map[string] string
 	backupNodes map [string] string //Use as a set
-	//dataMasterCli dataMasterPb.DataMasterClient
 }
 
 func (dataServer *DataServer) ClientDataPut(ctx context.Context, req *clientDataPb.ClientDataPutReq) (*clientDataPb.ClientDataPutResp, error){
 
 	dataServer.database[req.Key] = req.Value
 
-	log.Printf("put key: %v, value: %v\n", req.Key, req.Value)
-	log.Println(dataServer.database)
+	utils.Debug("put key: %v, value: %v\n", req.Key, req.Value)
+	utils.Debug("database in ClientDataPut: %v\n", dataServer.database)
 
 	err := SyncBackupPut(dataServer.backupNodes, req.Key, req.Value)
 	if err != nil{
@@ -79,6 +78,8 @@ func (dataServer *DataServer) ClientDataDelete(ctx context.Context, req *clientD
 		return nil, errors.New("no value in the database")
 	}
 	delete(dataServer.database, req.Key)
+
+	utils.Debug("database in ClientDataDelete: %v\n", dataServer.database)
 
 	err := SyncBackupDelete(dataServer.backupNodes, req.Key)
 	if err != nil{
@@ -300,11 +301,11 @@ func (backupServer *BackupServer) MasterBackupInformPromotion (ctx context.Conte
 			utils.Error("Backup server can not listen the data server port %s: %v\n", backupServer.dataPort, err)
 			return err
 		}
+		log.Println("Now serve as a data server")
 		grpcServer := grpc.NewServer()
 		clientDataPb.RegisterClientDataServer(grpcServer, dataServer)
 		masterDataPb.RegisterMasterDataServer(grpcServer, dataServer)
 		dataDataPb.RegisterDataDataServer(grpcServer, dataServer)
-		log.Println("Now serve as a data server")
 		if err = grpcServer.Serve(lis); err != nil{
 			utils.Error("Can not serve the listener on port %s: %v\n", dataPort, err)
 			return err

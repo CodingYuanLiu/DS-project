@@ -17,7 +17,7 @@ func thread1(c chan string, sum *int) {
 		fmt.Println(err)
 	}
 	fmt.Println("New lock for lock1")
-	l := NewLock(zkConn, lockPath)
+	l := NewLock(zkConn, LockPath)
 	fmt.Printf("cli 1 id: %s\n", l.ID)
 	for i:=0; i < 100000; i++{
 		err = l.Lock()
@@ -45,7 +45,7 @@ func thread2(c chan string, sum *int) {
 		fmt.Println(err)
 	}
 	fmt.Println("New lock for lock2")
-	l := NewLock(zkConn, lockPath)
+	l := NewLock(zkConn, LockPath)
 	fmt.Printf("cli 2 id: %s\n", l.ID)
 	for i:=0; i < 100000; i++{
 		err = l.Lock()
@@ -86,7 +86,7 @@ func thread11(c chan string) {
 		fmt.Println(err)
 	}
 	fmt.Println("New lock for lock2")
-	l := NewLock(zkConn, lockPath)
+	l := NewLock(zkConn, LockPath)
 	l.Lock()
 	l.Lock()
 	c <- "t1 finished"
@@ -100,7 +100,7 @@ func thread21(c chan string) {
 		fmt.Println(err)
 	}
 	fmt.Println("New lock for lock2")
-	l := NewLock(zkConn, lockPath)
+	l := NewLock(zkConn, LockPath)
 	l.Unlock()
 
 	c <- "t2 finished"

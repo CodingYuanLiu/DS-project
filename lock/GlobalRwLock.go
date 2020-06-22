@@ -5,7 +5,6 @@ import (
 	"errors"
 	"fmt"
 	"github.com/samuel/go-zookeeper/zk"
-	"log"
 	"strconv"
 	"time"
 )
@@ -19,8 +18,8 @@ type GlobalRwLock struct{
 
 
 func NewGlobalRwLock() GlobalRwLock {
-	readerLockPath := fmt.Sprintf("%s%s", globalLockPath, readerLockPath)
-	writerLockPath := fmt.Sprintf("%s%s", globalLockPath, writerLockPath)
+	readerLockPath := fmt.Sprintf("%s%s", GlobalLockPath, ReaderLockPath)
+	writerLockPath := fmt.Sprintf("%s%s", GlobalLockPath, WriterLockPath)
 	hosts := []string{"localhost:2181", "localhost:2182", "localhost:2183"}
 
 	conn, _, err := zk.Connect(hosts, time.Second * 5)
@@ -36,7 +35,7 @@ func NewGlobalRwLock() GlobalRwLock {
 }
 
 func GetGlobalReaderNum(conn *zk.Conn) (int, error){
-	path := fmt.Sprintf("%s%s", ReaderNumRootPath, globalReaderPath)
+	path := fmt.Sprintf("%s%s", ReaderNumRootPath, GlobalReaderPath)
 	v, _, err := conn.Get(path)
 	if err != nil{
 		utils.Error("reader path: %s\n", path)
@@ -46,7 +45,7 @@ func GetGlobalReaderNum(conn *zk.Conn) (int, error){
 }
 
 func SetGlobalReaderNum(conn *zk.Conn, reader int) error{
-	path := fmt.Sprintf("%s%s", ReaderNumRootPath, globalReaderPath)
+	path := fmt.Sprintf("%s%s", ReaderNumRootPath, GlobalReaderPath)
 	exist, s, err := conn.Exists(path)
 	if !exist{
 		return errors.New("the node does not exist")
@@ -55,7 +54,7 @@ func SetGlobalReaderNum(conn *zk.Conn, reader int) error{
 	}
 	_, err = conn.Set(path, []byte(strconv.Itoa(reader)), s.Version)
 	if err != nil{
-		log.Printf("[error] set reader num %d error: %v, version: %d\n", reader, err, s.Version)
+		utils.Error("set reader num %d error: %v, version: %d\n", reader, err, s.Version)
 	}
 	return err
 }
@@ -66,25 +65,25 @@ func (l *GlobalRwLock) LockReader() error{
 	}
 	reader, err := GetGlobalReaderNum(l.conn)
 	if err != nil{
-		log.Printf("[error] GetGlobalReaderNum in LockReader error: %v\n", err)
+		utils.Error("GetGlobalReaderNum in LockReader error: %v\n", err)
 		return err
 	}
 	reader += 1
 	//log.Printf("update reader: %d\n", reader)
 	if reader == 1{
-		log.Printf("[DEBUG] reader == 1, lock writer with ID: %s\n", l.writerLock.ID)
+		utils.Debug("reader == 1, lock writer with ID: %s\n", l.writerLock.ID)
 		if err := l.writerLock.Lock(); err != nil{
-			log.Printf("[error] writerLock.Lock in LockReader error: %v\n", err)
+			utils.Error("writerLock.Lock in LockReader error: %v\n", err)
 			return err
 		}
 	}
-	utils.Debug("[DEBUG] set reader num in lock reader %d", reader)
+	utils.Debug("set reader num in lock reader %d", reader)
 	if err := SetGlobalReaderNum(l.conn, reader); err != nil{
-		log.Printf("[error] SetReaderNum in LockReader error: %v\n", err)
+		utils.Error("SetReaderNum in LockReader error: %v\n", err)
 		return err
 	}
 	if err := l.readerLock.Unlock(); err != nil{
-		log.Printf("[error] readerLock.Unlock in LockReader error: %v\n", err)
+		utils.Error("readerLock.Unlock in LockReader error: %v\n", err)
 		return err
 	}
 	return nil
@@ -96,27 +95,27 @@ func (l *GlobalRwLock) UnlockReader() error{
 	}
 	reader, err := GetGlobalReaderNum(l.conn)
 	if err != nil{
-		log.Printf("[error] GetGlobalReaderNum in UnlockReader error: %v\n", err)
+		utils.Error("GetGlobalReaderNum in UnlockReader error: %v\n", err)
 		return err
 	}
 	reader -= 1
 
 	if reader == 0{
-		log.Printf("[DEBUG] reader == 0, unlock writer\n")
+		utils.Debug("reader == 0, unlock writer\n")
 		if err := l.writerLock.Unlock(); err != nil{
-			log.Printf("[error] writerlock.Unlock in UnlockReader error: %v\n", err)
+			utils.Error("writerlock.Unlock in UnlockReader error: %v\n", err)
 			return err
 		}
 	}
 
-	utils.Debug("[DEBUG] set reader num in unlock reader %d", reader)
+	utils.Debug("set reader num in unlock reader %d", reader)
 	if err := SetGlobalReaderNum(l.conn, reader); err != nil{
-		log.Printf("[error] SetReaderNum in UnlockReader error: %v\n", err)
+		utils.Error("SetReaderNum in UnlockReader error: %v\n", err)
 		return err
 	}
 
 	if err := l.readerLock.Unlock(); err != nil{
-		log.Printf("[error] readerLock.Unlock in UnlockReader error: %v\n", err)
+		utils.Error("readerLock.Unlock in UnlockReader error: %v\n", err)
 		return err
 	}
 	return nil
@@ -125,7 +124,7 @@ func (l *GlobalRwLock) UnlockReader() error{
 func (l *GlobalRwLock) LockWriter() error{
 	utils.Debug("lock writerlock in LockWriter, id: %s", l.writerLock.ID)
 	if err := l.writerLock.Lock(); err != nil{
-		log.Printf("[error] writerLock.Lock in LockWriter error: %v\n", err)
+		utils.Error("writerLock.Lock in LockWriter error: %v\n", err)
 		return err
 	}
 	return nil
@@ -133,7 +132,7 @@ func (l *GlobalRwLock) LockWriter() error{
 
 func (l *GlobalRwLock) UnlockWriter() error{
 	if err := l.writerLock.Unlock(); err != nil{
-		log.Printf("[error] writerLock.Unlock in UnlockWriter error: %v\n", err)
+		utils.Error("writerLock.Unlock in UnlockWriter error: %v\n", err)
 		return err
 	}
 	return nil

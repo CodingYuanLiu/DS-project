@@ -46,12 +46,7 @@ func (l *Lock) Lock() error{
 		return errors.New("create new lock node error " + err.Error())
 	}
 	utils.Debug("set lock %s\n", newLockFullPath)
-	/*
-	err = l.lockQueue.Put(lockNode)
-	if err != nil{
-		log.Printf("[error] append new lock node to queue error: %v\n", err)
-	}
-	 */
+
 	for {
 		locks, _, getCh, err := l.conn.ChildrenW(l.lockRootPath)
 		if err != nil{
@@ -100,7 +95,7 @@ func (l *Lock) Unlock() error{
 		log.Printf("unlock delete lock node error\n")
 		return err
 	}
-	utils.Debug("[DEBUG] %s: release lock\n",releaseLockPath)
+	utils.Debug("%s: release lock\n",releaseLockPath)
 	return nil
 }
 

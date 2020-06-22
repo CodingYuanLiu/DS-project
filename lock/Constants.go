@@ -1,10 +1,10 @@
 package lock
 
 const (
-	lockPath          = "/locks"
-	readerLockPath    = "/readerLock"
-	writerLockPath    = "/writerLock"
+	LockPath          = "/locks"
+	ReaderLockPath    = "/readerLock"
+	WriterLockPath    = "/writerLock"
 	ReaderNumRootPath = "/readers"
-	globalLockPath = "/globalLock"
-	globalReaderPath = "/global" /* i.e., /readers/global */
+	GlobalLockPath    = "/globalLock"
+	GlobalReaderPath  = "/global" /* i.e., /readers/global */
 )

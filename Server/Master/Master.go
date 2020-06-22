@@ -1,11 +1,10 @@
 package main
 
 import (
+	"FinalProject/lock"
 	clientMasterPb "FinalProject/proto/ClientMaster"
-	dataMasterPb "FinalProject/proto/DataMaster"
 	"FinalProject/utils"
 
-	//masterDataPb "FinalProject/proto/MasterData"
 	"context"
 	"fmt"
 	"github.com/samuel/go-zookeeper/zk"
@@ -19,7 +18,6 @@ import (
 
 type Master struct{
 	clientMasterPb.UnimplementedClientMasterServer
-	dataMasterPb.UnimplementedDataMasterServer
 
 	//Store the metadata of the nodes
 	dataNodeManager *DataNodeManager //key:value => ID:port
@@ -60,11 +58,28 @@ func (master *Master) WatchNewDataNode(path string) error{
 	return nil
 }
 
-func (master *Master) DataMasterReshardComplete(ctx context.Context, req *dataMasterPb.DataMasterReshardCompleteReq) (*dataMasterPb.DataMasterReshardCompleteResp, error){
-	utils.Debug("Reshard complete from a data node\n")
-	return &dataMasterPb.DataMasterReshardCompleteResp{
-		Message: "Hello 2 rpc server " + req.Message,
-	}, nil
+
+func InitializeRootZnodes(conn *zk.Conn) error{
+	rootZnodes := []string{backupNodesPath, dataNodesPath, lock.ReaderNumRootPath, lock.LockPath, lock.GlobalLockPath,
+		fmt.Sprintf("%s%s", lock.ReaderNumRootPath, lock.GlobalReaderPath),
+		fmt.Sprintf("%s%s", lock.LockPath, lock.ReaderLockPath),
+		fmt.Sprintf("%s%s", lock.LockPath, lock.WriterLockPath),
+	}
+	for _, znodePath := range rootZnodes{
+		exist, _, err := conn.Exists(znodePath)
+		if err != nil{
+			utils.Error("Check existence in InitializeRootZnodes error: %v\n", err)
+			return err
+		}
+		if !exist{
+			_, err := conn.Create(znodePath, []byte("0"), 0, zk.WorldACL(zk.PermAll))
+			if err != nil{
+				utils.Error("Create new root znodes error: %v\n", err)
+				return err
+			}
+		}
+	}
+	return nil
 }
 
 func main(){
@@ -76,6 +91,10 @@ func main(){
 
 	zkConn := ConnectZookeeper()
 	defer zkConn.Close()
+	if err := InitializeRootZnodes(zkConn); err != nil{
+		log.Fatal(err)
+	}
+
 	dataNodeManager, err := NewDataNodeManager(zkConn)
 	if err != nil{
 		log.Fatalf("fail to initialize data node manager: %v", err)
@@ -88,7 +107,6 @@ func main(){
 
 	s := grpc.NewServer()
 	clientMasterPb.RegisterClientMasterServer(s, &masterServer)
-	dataMasterPb.RegisterDataMasterServer(s, &masterServer)
 
 	fmt.Println("Register complete, ready to serve...")
 	if err := s.Serve(lis); err != nil{

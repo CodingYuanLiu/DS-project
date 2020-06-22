@@ -124,17 +124,6 @@ func InitializeDataServer(lis net.Listener, port string){
 
 	go HeartBeatResponse(zkConn, port)
 
-	//TEST
-	/*
-		ctx, cancel := context.WithTimeout(context.Background(), 5 * time.Second)
-		defer cancel()
-		resp, _ := dataServer.dataMasterCli.DataMasterReshardComplete(ctx, &dataMasterPb.DataMasterReshardCompleteReq{
-			Message: "reshard complete",
-		})
-		utils.Debug("Response from master via rpc: %v\n", resp.Message)
-	*/
-	//END TEST
-
 	//Register rpc servers
 	clientDataPb.RegisterClientDataServer(grpcServer, dataServer)
 	masterDataPb.RegisterMasterDataServer(grpcServer, dataServer)
@@ -155,7 +144,7 @@ func main() {
 	fmt.Printf("Data node listening port %v...\n", port)
 
 	if err != nil{
-		//TODO: err so register backup server
+		//register backup server
 		if err := InitializeBackupServer(port); err != nil{
 			utils.Error("Initialize backup server error: %v\n", err)
 			log.Fatal(err)

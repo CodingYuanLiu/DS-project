@@ -1,4 +1,5 @@
 # DS-lab: final project
+> 为做这个作业过程中的一些笔记
 ## Day1
  * 1 master + 2 data node + sequential requests
  * 没有考虑多client加锁问题
