@@ -52,12 +52,16 @@ func (cli *Client) GetDataNodePort(key string) (string,error){
 }
 func (cli *Client) Put(key string, value string) error {
 	if err := cli.globalRwLock.LockReader(); err != nil{
-		utils.Error("UnlockReader error in Delete: %v\n", err)
+		utils.Error("lockReader error in Put: %v\n", err)
 		return err
 	}
 
 	port, err := cli.GetDataNodePort(key)
 	if err != nil{
+		if unlockErr := cli.globalRwLock.UnlockReader(); unlockErr != nil{
+			utils.Error("unlockReader error in Put: %v\n", unlockErr)
+			return unlockErr
+		}
 		log.Fatalf("Get data node from master error: %v\n", err)
 		return err
 	}
@@ -69,6 +73,10 @@ func (cli *Client) Put(key string, value string) error {
 	rwLock := cli.GetRwLock(port)
 	if err := rwLock.LockWriter(); err!= nil{
 		log.Printf("[error] lock writer error: %v\n", err)
+		if unlockErr := cli.globalRwLock.UnlockReader(); unlockErr != nil{
+			utils.Error("unlockReader error in Put: %v\n", unlockErr)
+			return unlockErr
+		}
 		return err
 	}
 
@@ -79,7 +87,15 @@ func (cli *Client) Put(key string, value string) error {
 	if err != nil{
 		if err := rwLock.UnlockWriter(); err!= nil{
 			log.Printf("[error] unlock writer error: %v\n", err)
+			if unlockErr := cli.globalRwLock.UnlockReader(); unlockErr != nil{
+				utils.Error("unlockReader error in Put: %v\n", unlockErr)
+				return unlockErr
+			}
 			return err
+		}
+		if unlockErr := cli.globalRwLock.UnlockReader(); unlockErr != nil{
+			utils.Error("unlockReader error in Put: %v\n", unlockErr)
+			return unlockErr
 		}
 		log.Fatalf("Put key-value to data node error: %v\n", err)
 		return err
@@ -87,6 +103,10 @@ func (cli *Client) Put(key string, value string) error {
 
 	if err := rwLock.UnlockWriter(); err!= nil{
 		log.Printf("[error] unlock writer error: %v\n", err)
+		if unlockErr := cli.globalRwLock.UnlockReader(); unlockErr != nil{
+			utils.Error("unlockReader error in Put: %v\n", unlockErr)
+			return unlockErr
+		}
 		return err
 	}
 	if err := cli.globalRwLock.UnlockReader(); err != nil{
@@ -105,6 +125,10 @@ func (cli *Client) Read(key string) (string, error){
 	}
 	port, err := cli.GetDataNodePort(key)
 	if err != nil{
+		if unlockErr := cli.globalRwLock.UnlockReader(); unlockErr != nil{
+			utils.Error("unlockReader error in Read: %v\n", unlockErr)
+			return "", unlockErr
+		}
 		log.Fatalf("Get data node from master.exe error: %v\n", err)
 		return "", err
 	}
@@ -124,7 +148,15 @@ func (cli *Client) Read(key string) (string, error){
 	if err != nil{
 		log.Printf("Put key-value to data node error: %v\n", err)
 		if err := rwLock.UnlockReader(); err!= nil{
+			if unlockErr := cli.globalRwLock.UnlockReader(); unlockErr != nil{
+				utils.Error("unlockReader error in Read: %v\n", unlockErr)
+				return "", unlockErr
+			}
 			return "", err
+		}
+		if unlockErr := cli.globalRwLock.UnlockReader(); unlockErr != nil{
+			utils.Error("unlockReader error in Read: %v\n", unlockErr)
+			return "", unlockErr
 		}
 		return "", err
 	}
@@ -150,6 +182,10 @@ func (cli *Client) Delete(key string) error{
 
 	port, err := cli.GetDataNodePort(key)
 	if err != nil{
+		if unlockErr := cli.globalRwLock.UnlockReader(); unlockErr != nil{
+			utils.Error("unlockReader error in Delete: %v\n", unlockErr)
+			return unlockErr
+		}
 		log.Fatalf("Get data node from master error: %v\n", err)
 		return err
 	}
@@ -160,6 +196,10 @@ func (cli *Client) Delete(key string) error{
 
 	rwLock := cli.GetRwLock(port)
 	if err := rwLock.LockWriter(); err!= nil{
+		if unlockErr := cli.globalRwLock.UnlockReader(); unlockErr != nil{
+			utils.Error("unlockReader error in Delete: %v\n", unlockErr)
+			return unlockErr
+		}
 		return err
 	}
 
@@ -169,11 +209,19 @@ func (cli *Client) Delete(key string) error{
 	if err != nil{
 		log.Printf("Put key-value to data node error: %v\n", err)
 		if err := rwLock.UnlockWriter(); err!= nil{
+			if unlockErr := cli.globalRwLock.UnlockReader(); unlockErr != nil{
+				utils.Error("unlockReader error in Delete: %v\n", unlockErr)
+				return unlockErr
+			}
 			return err
 		}
 		return err
 	}
 	if err := rwLock.UnlockWriter(); err!= nil{
+		if unlockErr := cli.globalRwLock.UnlockReader(); unlockErr != nil{
+			utils.Error("unlockReader error in Delete: %v\n", unlockErr)
+			return unlockErr
+		}
 		return err
 	}
 	if err := cli.globalRwLock.UnlockReader(); err != nil{

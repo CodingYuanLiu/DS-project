@@ -28,7 +28,7 @@ func (master *Master) ClientMasterFindDataNode(ctx context.Context, req *clientM
 
 	dataPort, err := master.dataNodeManager.FindDataNode(req.Key)
 	if err != nil{
-		log.Printf("Find data node error: %v\n", err)
+		utils.Error("Find data node error: %v\n", err)
 		return nil, err
 	}
 	return &clientMasterPb.ClientMasterFindDataNodeResp{

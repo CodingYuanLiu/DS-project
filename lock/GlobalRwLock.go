@@ -71,13 +71,13 @@ func (l *GlobalRwLock) LockReader() error{
 	reader += 1
 	//log.Printf("update reader: %d\n", reader)
 	if reader == 1{
-		utils.Debug("reader == 1, lock writer with ID: %s\n", l.writerLock.ID)
+		//utils.Debug("reader == 1, lock writer with ID: %s\n", l.writerLock.ID)
 		if err := l.writerLock.Lock(); err != nil{
 			utils.Error("writerLock.Lock in LockReader error: %v\n", err)
 			return err
 		}
 	}
-	utils.Debug("set reader num in lock reader %d", reader)
+	//utils.Debug("set reader num in lock reader %d", reader)
 	if err := SetGlobalReaderNum(l.conn, reader); err != nil{
 		utils.Error("SetReaderNum in LockReader error: %v\n", err)
 		return err
@@ -101,14 +101,14 @@ func (l *GlobalRwLock) UnlockReader() error{
 	reader -= 1
 
 	if reader == 0{
-		utils.Debug("reader == 0, unlock writer\n")
+		//utils.Debug("reader == 0, unlock writer\n")
 		if err := l.writerLock.Unlock(); err != nil{
 			utils.Error("writerlock.Unlock in UnlockReader error: %v\n", err)
 			return err
 		}
 	}
 
-	utils.Debug("set reader num in unlock reader %d", reader)
+	//utils.Debug("set reader num in unlock reader %d", reader)
 	if err := SetGlobalReaderNum(l.conn, reader); err != nil{
 		utils.Error("SetReaderNum in UnlockReader error: %v\n", err)
 		return err
@@ -122,7 +122,7 @@ func (l *GlobalRwLock) UnlockReader() error{
 }
 
 func (l *GlobalRwLock) LockWriter() error{
-	utils.Debug("lock writerlock in LockWriter, id: %s", l.writerLock.ID)
+	//utils.Debug("lock writerlock in LockWriter, id: %s", l.writerLock.ID)
 	if err := l.writerLock.Lock(); err != nil{
 		utils.Error("writerLock.Lock in LockWriter error: %v\n", err)
 		return err

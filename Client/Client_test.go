@@ -4,6 +4,7 @@ package main
 import (
 	"errors"
 	"fmt"
+	"strconv"
 	"testing"
 	"time"
 )
@@ -35,10 +36,11 @@ func TestBasicOperations(t *testing.T){
 	if err := cli.Delete("testkey2"); err != nil{
 		t.Error(err)
 	}
-
-	if _, err := cli.Read("testkey2"); err == nil{
+	 value, err := cli.Read("testkey2")
+	 if err == nil{
 		t.Error(errors.New("this should return an error"))
 	}
+	fmt.Printf("value: %s, err: %v\n", value, err)
 
 	if err := cli.Put("testkey2", "value2"); err != nil{
 		t.Error(err)
@@ -47,6 +49,16 @@ func TestBasicOperations(t *testing.T){
 	if value, err := cli.Read("testkey2"); err != nil || value != "value2"{
 		t.Error(err)
 	}
+	for i := 0; i < 10; i++{
+		if err := cli.Put("k" + strconv.Itoa(i), "v" + strconv.Itoa(i)); err != nil{
+			t.Error(err)
+		}
+
+		if value, err := cli.Read("k" + strconv.Itoa(i)); err != nil || value != "v" + strconv.Itoa(i){
+			t.Error(err)
+		}
+	}
+
 }
 
 

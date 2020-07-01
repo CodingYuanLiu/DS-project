@@ -263,25 +263,25 @@ func (dataNodeManager *DataNodeManager) WatchNewDataNode(path string) error {
 	for {
 		_, _, getCh, err := conn.ChildrenW(path)
 		if err != nil {
-			fmt.Printf("watch children error: %v\n", err)
+			utils.Error("watch children error: %v\n", err)
 		}
 
 		select {
 		case chEvent := <- getCh:
 			{
-				fmt.Printf("%+v\n", chEvent)
+				utils.Debug("%+v\n", chEvent)
 				if chEvent.Type == zk.EventNodeChildrenChanged {
-					fmt.Printf("detect data node changed on zookeeper\n")
+					log.Printf("detect data node changed on zookeeper\n")
 					v,_, err := conn.Children(path)
 					if err != nil{
 						return err
 					}
 					utils.Debug("value of path[%s]=[%s].\n", path, v)
 					if err := dataNodeManager.HandleDataNodesChanges(v); err != nil{
-						log.Printf("Handle data nodes change error: %v\n", err)
+						utils.Error("Handle data nodes change error: %v\n", err)
 					}
 				} else{
-					fmt.Printf("other events on path %s\n", chEvent.Path)
+					utils.Debug("other events on path %s\n", chEvent.Path)
 				}
 			}
 		}

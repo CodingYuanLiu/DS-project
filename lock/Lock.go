@@ -52,7 +52,7 @@ func (l *Lock) Lock() error{
 		if err != nil{
 			return errors.New("watch pending locks error")
 		}
-		utils.Debug("header lock: %v, my lock: %v\n", locks[GetFirstLockNodeIndex(locks)], l.ID)
+		//utils.Debug("header lock: %v, my lock: %v\n", locks[GetFirstLockNodeIndex(locks)], l.ID)
 
 		firstLockNodeSplitByColon := strings.Split(locks[GetFirstLockNodeIndex(locks)], ":")
 		firstLockSequentialNum := firstLockNodeSplitByColon[len(firstLockNodeSplitByColon) - 1]
